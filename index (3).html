@@ -1,0 +1,1244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Whiria Ngā Ara — theory of change builder</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#FAFAF6; --paper-2:#F2F1EA; --surface:#FFFFFF; --surface-2:#F4F3EE;
+  --primary:#1C5A4A; --primary-deep:#143F34; --primary-soft:#E5EFE9; --primary-line:#BCD6CB;
+  --accent:#B66A38; --accent-soft:#F3E7DC; --accent-line:#E6C9AE;
+  --ink:#23211E; --ink-2:#5F5B53; --ink-3:#928D83;
+  --line:rgba(35,33,30,.12); --line-2:rgba(35,33,30,.22);
+  --kawa:#C77F1B; --systemic:#2E7CC4; --material:#1F9E78; --behaviour:#D8553A; --symptomatic:#7A72C9;
+  --r-s:9px; --r-m:13px; --r-l:18px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{background:var(--paper);color:var(--ink);font-family:'Inter',system-ui,-apple-system,sans-serif;font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased}
+#root{min-height:100%}
+button{font-family:inherit}
+.disp{font-family:'Inter',system-ui,sans-serif}
+
+/* buttons / inputs */
+.btn{font-size:14px;font-weight:500;border:.5px solid var(--line-2);background:var(--surface);color:var(--ink);border-radius:var(--r-s);padding:9px 16px;cursor:pointer;display:inline-flex;align-items:center;gap:7px;transition:background .15s,border-color .15s,transform .1s}
+.btn:hover{background:var(--surface-2)}
+.btn:active{transform:translateY(1px)}
+.btn:focus-visible{outline:none;box-shadow:0 0 0 3px var(--primary-soft);border-color:var(--primary)}
+.btn-primary{background:var(--primary);border-color:var(--primary);color:#fff}
+.btn-primary:hover{background:var(--primary-deep)}
+.btn-ghost{border-color:transparent;background:transparent;color:var(--ink-2)}
+.btn-ghost:hover{background:var(--surface-2)}
+.btn-block{width:100%;justify-content:center}
+.btn:disabled{opacity:.45;cursor:default}
+.icon{width:1em;height:1em;display:inline-block;vertical-align:-2px}
+input[type=text],input[type=email],textarea,select{width:100%;font-family:inherit;font-size:14px;color:var(--ink);background:var(--surface);border:.5px solid var(--line-2);border-radius:var(--r-s);padding:10px 12px}
+textarea{resize:vertical;line-height:1.5}
+input:focus,textarea:focus,select:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-soft)}
+::placeholder{color:var(--ink-3)}
+
+/* helper tip */
+.tip{display:flex;align-items:flex-start;gap:10px;background:var(--surface-2);border:.5px solid var(--line);border-radius:var(--r-m);padding:11px 13px;margin:0 0 18px;font-size:13.5px;color:var(--ink-2);line-height:1.45;max-width:680px}
+.tip-ic{flex:none;margin-top:1px;color:var(--accent)}
+.tip-tx{flex:1}
+.tip-x{flex:none;border:0;background:transparent;color:var(--ink-3);cursor:pointer;padding:3px;border-radius:6px;line-height:0}
+.tip-x:hover{background:rgba(35,33,30,.07);color:var(--ink)}
+.tip-x:focus-visible{outline:none;box-shadow:0 0 0 3px var(--primary-soft)}
+
+/* logo */
+.lockup{display:flex;align-items:center;gap:11px}
+.tile{width:38px;height:38px;border-radius:11px;background:var(--primary);display:flex;align-items:center;justify-content:center;flex:none}
+.wordmark{font-weight:600;font-size:18px;letter-spacing:-.01em;color:var(--ink)}
+.wordmark small{display:block;font-weight:500;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);margin-top:1px}
+
+/* ============ LANDING ============ */
+.hero{display:grid;grid-template-columns:1fr 1.08fr;min-height:100vh}
+.hero-left{display:flex;flex-direction:column;justify-content:center;padding:54px 6vw;max-width:620px;margin-left:auto;width:100%}
+.hero-right{position:relative;background:linear-gradient(160deg,#F4F3EC 0%,#EBEFE9 60%,#E4ECE6 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;border-left:.5px solid var(--line)}
+.eyebrow{font-size:12px;font-weight:600;letter-spacing:.13em;text-transform:uppercase;color:var(--primary);margin:26px 0 14px}
+.hero h1{font-weight:600;font-size:clamp(32px,3.8vw,44px);line-height:1.12;letter-spacing:-.022em;margin:0 0 16px;color:var(--ink)}
+.hero h1 em{font-style:normal;color:var(--primary)}
+.hero .sub{font-size:16px;color:var(--ink-2);margin:0 0 30px;max-width:46ch;line-height:1.5}
+.signin{max-width:380px}
+.signin .lbl{display:block;font-size:13px;font-weight:500;margin:0 0 6px}
+.users{margin-top:16px;display:flex;flex-direction:column;gap:8px}
+.user{display:flex;align-items:center;justify-content:space-between;gap:10px;border:.5px solid var(--line);background:var(--surface);border-radius:var(--r-m);padding:10px 13px;cursor:pointer;text-align:left;transition:border-color .15s,background .15s}
+.user:hover{border-color:var(--primary-line);background:var(--primary-soft)}
+.user:focus-visible{outline:none;box-shadow:0 0 0 3px var(--primary-soft);border-color:var(--primary)}
+.user .nm{font-size:14px;font-weight:500;margin:0}
+.user .em{font-size:12px;color:var(--ink-2);margin:0}
+.badge{font-size:11px;font-weight:600;letter-spacing:.02em;padding:3px 9px;border-radius:999px;flex:none}
+.badge.ok{background:var(--primary-soft);color:var(--primary-deep)}
+.badge.wait{background:var(--accent-soft);color:var(--accent)}
+.note{font-size:12px;color:var(--ink-3);margin:16px 0 0;line-height:1.45}
+.ring-cap{position:absolute;top:34px;left:0;right:0;text-align:center;z-index:3}
+.ring-cap .k{font-size:12px;font-weight:600;letter-spacing:.13em;text-transform:uppercase;color:var(--primary)}
+.ring-cap .pills{display:flex;gap:7px;justify-content:center;margin-top:10px;flex-wrap:wrap}
+.pill{font-size:11px;font-weight:500;color:var(--ink-2);background:rgba(255,255,255,.7);border:.5px solid var(--line);border-radius:999px;padding:4px 11px}
+.ring-stage{position:relative;width:480px;height:480px;flex:none}
+.ring-glow{position:absolute;inset:-12%;background:radial-gradient(circle at center,rgba(28,90,74,.13),rgba(28,90,74,0) 62%);pointer-events:none}
+.ring-guide{position:absolute;inset:7%;border:1.6px dashed rgba(20,63,52,.42);border-radius:50%}
+.ring-guide.two{inset:20%;border-color:rgba(20,63,52,.3)}
+.ring-center{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:230px;z-index:2}
+.ring-center .ttl{font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);text-align:center;margin-bottom:8px}
+.cgrid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.cbox{background:var(--surface);border:.5px solid var(--primary-line);border-radius:8px;padding:7px 8px;font-size:11px;line-height:1.2;color:var(--primary-deep);text-align:center;box-shadow:0 1px 2px rgba(20,63,52,.05)}
+.rotor{position:absolute;inset:0;animation:spin 70s linear infinite;transform-origin:center;z-index:1}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes spinrev{to{transform:rotate(-360deg)}}
+.slot{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%)}
+.counter{animation:spinrev 70s linear infinite;transform-origin:center}
+.ocard{width:108px;background:var(--surface);border-radius:9px;border:.5px solid var(--line);border-left:3px solid var(--ink-3);padding:8px 10px;font-size:11.5px;font-weight:500;line-height:1.18;color:var(--ink);box-shadow:0 2px 8px rgba(35,33,30,.07);text-align:left}
+.ocard .dom{display:block;font-size:9px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);margin-top:3px}
+.how{background:var(--paper);border-top:.5px solid var(--line);padding:64px 6vw}
+.how-in{max-width:1000px;margin:0 auto}
+.how h2{font-weight:600;font-size:clamp(24px,2.6vw,30px);letter-spacing:-.02em;margin:8px 0 6px;color:var(--ink)}
+.how .lede{color:var(--ink-2);margin:0 0 36px;max-width:54ch}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.step{background:var(--surface);border:.5px solid var(--line);border-radius:var(--r-l);padding:24px}
+.step .n{width:30px;height:30px;border-radius:50%;background:var(--primary-soft);color:var(--primary-deep);font-weight:600;font-size:14px;display:flex;align-items:center;justify-content:center;margin-bottom:14px}
+.step h3{font-size:16px;font-weight:600;margin:0 0 6px}
+.step p{font-size:14px;color:var(--ink-2);margin:0;line-height:1.5}
+.land-foot{text-align:center;color:var(--ink-3);font-size:12px;padding:26px}
+
+/* ============ APP SHELL ============ */
+.shell{min-height:100vh;display:flex;flex-direction:column}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:14px clamp(16px,4vw,40px);border-bottom:.5px solid var(--line);background:var(--surface);flex-wrap:wrap}
+.brandbtn{display:flex;align-items:center;gap:10px;background:none;border:0;cursor:pointer;padding:0}
+.brandbtn .tile{width:32px;height:32px;border-radius:9px}
+.brandbtn .wm{font-weight:600;font-size:16px;letter-spacing:-.01em;color:var(--ink)}
+.stepper{display:flex;align-items:center;gap:7px}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--line-2)}
+.dot.on{background:var(--primary)}
+.dot.done{background:var(--primary-line)}
+.stepname{font-size:12px;color:var(--ink-2);margin-left:5px}
+.bar-right{display:flex;align-items:center;gap:14px}
+.saved{font-size:12px;color:var(--ink-3);display:inline-flex;align-items:center;gap:4px;min-width:46px}
+.lang{display:inline-flex;border:.5px solid var(--line);border-radius:var(--r-s);overflow:hidden;font-size:12px}
+.lang button{border:0;background:transparent;color:var(--ink-2);padding:5px 11px;cursor:pointer}
+.lang button.on{background:var(--surface-2);color:var(--ink)}
+.helpbtn{display:inline-flex;align-items:center;gap:5px;border:.5px solid var(--line);background:var(--surface);color:var(--ink-2);border-radius:var(--r-s);padding:5px 10px;font-size:12.5px;font-weight:500;cursor:pointer}
+.helpbtn:hover{background:var(--surface-2);color:var(--ink)}
+.helpbtn .icon{width:15px;height:15px}
+.why{display:flex;gap:11px;align-items:flex-start;background:var(--primary-soft);border:.5px solid var(--primary-line);border-radius:var(--r-m);padding:11px 13px;margin:0 0 16px;max-width:780px}
+.why-ic{flex:none;color:var(--primary);margin-top:1px}
+.why-ic .icon{width:17px;height:17px}
+.why-tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
+.why-line{font-size:12.7px;line-height:1.46;color:var(--ink-2)}
+.why-k{display:inline-block;font-size:9px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--primary-deep);margin-right:7px}
+.why-act{flex:none;display:flex;align-items:center;gap:2px}
+.why-link{display:inline-flex;align-items:center;gap:3px;border:0;background:transparent;color:var(--primary);font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;padding:3px 5px;border-radius:6px}
+.why-link:hover{background:rgba(28,90,74,.09)}
+.why-link .icon{width:13px;height:13px}
+.why-x{flex:none;border:0;background:transparent;color:var(--ink-3);cursor:pointer;padding:3px;border-radius:6px;line-height:0}
+.why-x:hover{background:rgba(0,0,0,.05);color:var(--ink)}
+.why-x .icon{width:15px;height:15px}
+@media(max-width:620px){.why{flex-wrap:wrap}.why-act{margin-left:auto}}
+.help-wrap{max-width:880px}
+.help-list{display:flex;flex-direction:column;gap:12px;margin-top:6px}
+.help-card{border:.5px solid var(--line);border-radius:var(--r-l);background:var(--surface);padding:15px 18px;transition:box-shadow .2s,border-color .2s}
+.help-card.focus{border-color:var(--primary-line);box-shadow:0 0 0 3px var(--primary-soft)}
+.help-h{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.help-num{flex:none;width:24px;height:24px;border-radius:50%;background:var(--primary-soft);color:var(--primary-deep);font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center}
+.help-h h2{margin:0;font-size:16px;color:var(--ink)}
+.help-go{margin-left:auto;padding:5px 11px;font-size:12.5px}
+.help-p{margin:0 0 6px;font-size:13.1px;line-height:1.5;color:var(--ink-2)}
+.help-p strong{color:var(--ink)}
+.help-how{margin-top:9px;background:var(--paper);border-radius:var(--r-m);padding:9px 13px}
+.help-how-l{display:block;font-size:9.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-3);margin-bottom:4px}
+.help-how ol{margin:0;padding-left:18px}
+.help-how li{font-size:12.6px;line-height:1.55;color:var(--ink-2);margin:1px 0}
+.ind-prev{font-size:11.5px;line-height:1.36;color:var(--ink-3);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.ring-amb{position:absolute;inset:9%;border-radius:50%;background:radial-gradient(circle at 50% 46%,rgba(28,90,74,.11),rgba(28,90,74,0) 62%);pointer-events:none;z-index:0;animation:breathe 7s ease-in-out infinite}
+.ring-orbit-guide{position:absolute;left:50%;top:50%;width:80%;height:86%;transform:translate(-50%,-50%);border:1.3px dashed rgba(20,63,52,.15);border-radius:50%;pointer-events:none;z-index:0;animation:spin 95s linear infinite}
+.ring-canvas .ring-svg{z-index:1}
+.ring-canvas .ring-act,.ring-canvas .ring-card,.ring-canvas .ring-empty{z-index:2}
+.ring-ellipse{animation:march 2.6s linear infinite}
+@keyframes breathe{0%,100%{opacity:.5;transform:scale(.985)}50%{opacity:1;transform:scale(1.012)}}
+@keyframes march{to{stroke-dashoffset:-22}}
+@media(prefers-reduced-motion:reduce){.ring-amb,.ring-orbit-guide,.ring-ellipse{animation:none!important}}
+.userchip{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--ink-2)}
+.avatar{width:26px;height:26px;border-radius:50%;background:var(--primary-soft);color:var(--primary-deep);font-size:12px;font-weight:600;display:flex;align-items:center;justify-content:center}
+.main{flex:1;background:var(--paper)}
+.container{max-width:1040px;margin:0 auto;padding:30px clamp(16px,4vw,40px)}
+.footer{display:flex;align-items:center;justify-content:space-between;padding:14px clamp(16px,4vw,40px);border-top:.5px solid var(--line);background:var(--surface)}
+
+h1.title{font-weight:600;font-size:27px;line-height:1.18;letter-spacing:-.02em;margin:0 0 7px;color:var(--ink)}
+.lede{color:var(--ink-2);font-size:14.5px;margin:0 0 18px;max-width:62ch}
+.eyebrow2{font-size:12px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-3);margin:0 0 12px}
+.label{display:block;font-size:13px;color:var(--ink);margin:0 0 6px}
+.hint{font-size:12px;color:var(--ink-3)}
+.field{margin-bottom:17px;max-width:580px}
+
+/* dashboard */
+.dash-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:20px;flex-wrap:wrap}
+.section-h{margin:4px 0 3px}
+.section-h h2{font-size:14px;font-weight:600;letter-spacing:.01em;margin:0;color:var(--ink)}
+.sub-muted{font-size:13px;color:var(--ink-2);margin:0 0 14px}
+.ex-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(188px,1fr));gap:11px;margin-bottom:32px}
+.ex-card{text-align:left;border:.5px solid var(--line);background:var(--surface);border-radius:var(--r-m);padding:15px;cursor:pointer;transition:border-color .15s,background .15s,transform .1s;display:flex;flex-direction:column;gap:5px}
+.ex-card:hover{border-color:var(--primary-line);background:var(--primary-soft)}
+.ex-card:active{transform:translateY(1px)}
+.ex-card:focus-visible{outline:none;box-shadow:0 0 0 3px var(--primary-soft);border-color:var(--primary)}
+.exn{font-size:14.5px;font-weight:600;color:var(--ink)}
+.exb{font-size:12.5px;color:var(--ink-2);line-height:1.35}
+.exs{font-size:12px;font-weight:600;color:var(--primary);margin-top:3px;display:inline-flex;align-items:center;gap:4px}
+.toc-card{display:flex;align-items:center;justify-content:space-between;gap:12px;border:.5px solid var(--line);border-radius:var(--r-m);padding:14px 16px;margin-bottom:10px;background:var(--surface)}
+.toc-card:hover{border-color:var(--line-2)}
+.toc-name{font-size:15px;font-weight:600;margin:0 0 2px;cursor:pointer}
+.toc-meta{font-size:12px;color:var(--ink-2);margin:0}
+.toc-actions{display:flex;gap:4px;flex:none}
+.iconbtn{border:0;background:transparent;color:var(--ink-3);cursor:pointer;padding:7px;border-radius:7px;line-height:0}
+.iconbtn:hover{background:var(--surface-2);color:var(--ink)}
+.iconbtn:focus-visible{outline:none;box-shadow:0 0 0 3px var(--primary-soft);color:var(--ink)}
+.iconbtn:disabled{opacity:.3;cursor:default}
+
+/* pathway — vertical list */
+.split{display:flex;gap:0;min-height:calc(100vh - 126px)}
+.side{width:230px;flex:none;border-right:.5px solid var(--line);padding:22px;background:var(--surface)}
+.colmain{flex:1;padding:26px;min-width:0}
+.tpl{display:block;width:100%;text-align:left;font-size:13px;border:.5px solid var(--line);background:var(--surface);border-radius:var(--r-s);padding:10px 12px;margin-bottom:7px;cursor:pointer;color:var(--ink)}
+.tpl:hover{border-color:var(--primary-line);background:var(--primary-soft)}
+.tpl:focus-visible{outline:none;box-shadow:0 0 0 3px var(--primary-soft);border-color:var(--primary)}
+.or{display:flex;align-items:center;gap:8px;margin:16px 0}
+.or span{font-size:12px;color:var(--ink-3)}
+.or i{flex:1;height:.5px;background:var(--line)}
+.pathlist{max-width:600px;margin-top:2px}
+.act{display:flex;align-items:center;gap:11px;border:.5px solid var(--line-2);border-radius:var(--r-m);padding:11px 13px;background:var(--surface)}
+.act:focus-within{border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-soft)}
+.act .num{flex:none;width:24px;height:24px;border-radius:50%;background:var(--primary-soft);color:var(--primary-deep);font-size:13px;font-weight:600;display:flex;align-items:center;justify-content:center}
+.act input{flex:1;min-width:0;border:0;padding:5px 2px;background:transparent;font-size:14.5px;box-shadow:none}
+.act input:focus{outline:none;box-shadow:none}
+.act .tools{display:flex;gap:1px;flex:none}
+.conn{display:flex;justify-content:center;padding:3px 0;color:var(--ink-3)}
+.conn .icon{width:18px;height:18px}
+.addstep{display:flex;align-items:center;justify-content:center;gap:7px;border:1px dashed var(--line-2);border-radius:var(--r-m);padding:11px 14px;color:var(--ink-2);background:transparent;cursor:pointer;font-size:14px;width:100%;margin-top:8px}
+.addstep:hover{border-color:var(--primary-line);color:var(--primary);background:var(--primary-soft)}
+.addstep:focus-visible{outline:none;box-shadow:0 0 0 3px var(--primary-soft);border-color:var(--primary)}
+
+/* ============ CAUSAL RING BUILDER ============ */
+.dom-group{margin-bottom:14px}
+.dom-h{display:flex;align-items:center;gap:7px;font-size:11px;font-weight:600;letter-spacing:.03em;text-transform:uppercase;color:var(--ink-2);margin-bottom:6px}
+.dom-dot{width:9px;height:9px;border-radius:50%;flex:none}
+.palette-step{display:block;width:100%;text-align:left;border:.5px solid var(--line);border-left:3px solid var(--ink-3);background:var(--surface);border-radius:8px;padding:8px 10px;margin-bottom:6px;cursor:pointer}
+.palette-step:hover{background:var(--surface-2)}
+.palette-step:focus-visible{outline:none;box-shadow:0 0 0 3px var(--primary-soft)}
+.palette-step.added{opacity:.55;cursor:default;background:var(--surface-2)}
+.ps-name{display:flex;align-items:center;gap:5px;font-size:13px;font-weight:600;color:var(--ink)}
+.ps-name .icon{color:var(--primary);width:13px;height:13px}
+.ps-desc{display:block;font-size:11.5px;color:var(--ink-2);line-height:1.3;margin-top:2px}
+.ring-instruct{font-size:13px;color:var(--ink-2);background:var(--surface-2);border:.5px solid var(--line);border-radius:8px;padding:9px 12px;margin:0 0 14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.ring-instruct strong{color:var(--ink)}
+.linkclear{border:.5px solid var(--line-2);background:var(--surface);border-radius:6px;font-size:12px;font-weight:500;padding:3px 11px;cursor:pointer;color:var(--ink)}
+.linkclear:hover{background:var(--surface-2)}
+.ring-canvas-wrap{overflow:auto;padding:4px 0 6px}
+.ring-canvas{position:relative;flex:none;margin:0 auto}
+.ring-svg{position:absolute;left:0;top:0;pointer-events:none}
+.ring-act{position:absolute;transform:translate(-50%,-50%);display:flex;align-items:center;gap:7px;width:174px;background:var(--surface);border:1px solid var(--primary-line);border-radius:9px;padding:7px 9px;box-shadow:0 1px 3px rgba(20,63,52,.06)}
+.ring-act .ra-num{flex:none;width:19px;height:19px;border-radius:50%;background:var(--primary-soft);color:var(--primary-deep);font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center}
+.ring-act .ra-label{font-size:11.5px;color:var(--ink);line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ring-act.linkable{cursor:pointer;border-style:dashed}
+.ring-act.linkable:hover{background:var(--primary-soft)}
+.ring-act.linked{border-width:1.5px;border-style:solid;background:#fff}
+.ring-card{position:absolute;transform:translate(-50%,-50%);display:flex;align-items:center;gap:6px;max-width:140px;background:var(--surface);border:.5px solid var(--line);border-left:3px solid var(--ink-3);border-radius:8px;padding:7px 7px 7px 10px;box-shadow:0 2px 8px rgba(35,33,30,.1);cursor:pointer}
+.ring-card:hover{box-shadow:0 3px 12px rgba(35,33,30,.16)}
+.ring-card.sel{z-index:5}
+.rc-name{font-size:11.5px;font-weight:600;color:var(--ink);line-height:1.15;flex:1}
+.rc-x{flex:none;border:0;background:transparent;color:var(--ink-3);cursor:pointer;padding:1px;border-radius:4px;line-height:0}
+.rc-x:hover{background:rgba(35,33,30,.1);color:var(--ink)}
+.rc-x .icon{width:13px;height:13px}
+.ring-empty{position:absolute;left:50%;top:12px;transform:translateX(-50%);font-size:12px;color:var(--ink-3);background:var(--surface-2);border:1px dashed var(--line-2);border-radius:8px;padding:6px 12px;white-space:nowrap}
+.ring-key{margin-top:8px;max-width:640px}
+.key-list{list-style:none;padding:0;margin:8px 0 0}
+.key-list li{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--ink);padding:6px 0;border-bottom:.5px solid var(--line)}
+.key-dot{width:9px;height:9px;border-radius:50%;flex:none}
+.key-links{color:var(--ink-2)}
+.key-none{color:var(--ink-3);font-style:italic}
+
+.placeholder{border:1px dashed var(--line-2);border-radius:var(--r-m);padding:46px 28px;text-align:center;color:var(--ink-2);max-width:520px;margin:10px auto}
+.placeholder .pm{margin-bottom:12px;display:flex;justify-content:center}
+.banner{background:var(--primary-soft);border:.5px solid var(--primary-line);color:var(--primary-deep);font-size:13px;border-radius:var(--r-s);padding:10px 13px;margin:0 0 18px}
+
+/* levers */
+.lev-card{border:.5px solid var(--line);border-radius:var(--r-m);background:var(--surface);padding:15px 17px;margin-bottom:13px;max-width:720px}
+.lev-head{display:flex;align-items:center;gap:9px;margin-bottom:11px}
+.lev-head strong{font-size:15px;color:var(--ink)}
+.lev-dom{font-size:11px;font-weight:600;letter-spacing:.03em;text-transform:uppercase;color:var(--ink-3);margin-left:auto}
+.lev-opt{padding:3px 0}
+.lev-check{display:flex;align-items:flex-start;gap:9px;cursor:pointer;font-size:14px;color:var(--ink);padding:4px 0}
+.lev-check input{margin-top:3px;width:15px;height:15px;flex:none;accent-color:var(--primary)}
+.lev-q{margin:4px 0 8px 24px}
+.lev-qtext{display:block;font-size:13px;color:var(--ink-2);margin-bottom:5px}
+
+/* indicators */
+.ind-count{font-size:13px;color:var(--ink-2);background:var(--surface-2);border:.5px solid var(--line);border-radius:var(--r-s);padding:8px 12px;margin:0 0 14px;display:inline-block}
+.ind-card{border:.5px solid var(--line);border-radius:var(--r-m);background:var(--surface);padding:13px 16px;margin-bottom:10px;max-width:720px}
+.ind-card.off{opacity:.55;background:var(--surface-2)}
+.ind-top{display:flex;align-items:center;gap:9px;cursor:pointer}
+.ind-top input{width:15px;height:15px;flex:none;accent-color:var(--primary)}
+.ind-top strong{font-size:14.5px;color:var(--ink)}
+.ind-star{color:var(--accent);font-size:13px}
+.ind-level{font-size:11px;font-weight:600;letter-spacing:.03em;text-transform:uppercase;color:var(--ink-3);margin-left:auto}
+.ind-body{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin:11px 0 0 24px}
+.ind-body>div{font-size:12.5px;color:var(--ink-2);line-height:1.4}
+.ind-lab{display:block;font-size:10px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-3);margin-bottom:2px}
+
+/* narrative */
+.narr-tools{display:flex;gap:9px;margin:0 0 12px;flex-wrap:wrap}
+.narr-area{max-width:720px;font-size:14.5px;line-height:1.6;min-height:240px}
+.narr-src{max-width:720px;margin-top:16px;border:.5px solid var(--line);border-radius:var(--r-m);background:var(--surface-2);padding:14px 16px}
+.narr-src strong{font-size:13px;color:var(--ink)}
+.narr-src ul{margin:8px 0 6px;padding-left:18px}
+.narr-src li{font-size:13px;color:var(--ink-2);margin-bottom:3px}
+
+/* coherence */
+.coh-ok{display:flex;align-items:center;gap:10px;background:var(--primary-soft);border:.5px solid var(--primary-line);color:var(--primary-deep);border-radius:var(--r-m);padding:18px 20px;font-size:15px;max-width:680px}
+.coh-card{border:.5px solid var(--accent-line);border-left:3px solid var(--accent);border-radius:var(--r-m);background:var(--surface);padding:15px 18px;margin-bottom:12px;max-width:680px}
+.coh-h{font-size:15px;font-weight:600;color:var(--ink);margin-bottom:5px}
+.coh-msg{font-size:14px;color:var(--ink-2);margin:0 0 7px;line-height:1.5}
+.coh-fix{font-size:13.5px;color:var(--ink-2);margin:0 0 10px;line-height:1.5}
+.coh-fix strong{color:var(--ink)}
+
+/* export */
+.export-toolbar{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:20px;flex-wrap:wrap}
+.export-page{background:var(--surface);border:.5px solid var(--line);border-radius:var(--r-l);padding:34px 38px;margin:0 auto 26px;max-width:820px;box-shadow:0 2px 18px rgba(35,33,30,.06)}
+.ep-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;border-bottom:.5px solid var(--line);padding-bottom:16px;margin-bottom:20px}
+.ep-kicker{font-size:11px;font-weight:600;letter-spacing:.13em;text-transform:uppercase;color:var(--primary);margin-bottom:5px}
+.ep-title{font-size:23px;font-weight:600;letter-spacing:-.02em;margin:0;color:var(--ink)}
+.ep-purpose{font-size:15px;color:var(--ink-2);margin:0 0 18px;line-height:1.5;max-width:62ch}
+.ep-narr{margin:18px 0}
+.ep-narr p{font-size:14px;color:var(--ink);line-height:1.6;margin:0 0 11px}
+.ep-cols{display:grid;grid-template-columns:1.1fr 1fr;gap:26px;border-top:.5px solid var(--line);padding-top:18px;margin-top:6px}
+.ep-cols h3{font-size:12px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-3);margin:0 0 9px}
+.ep-sl{list-style:none;padding:0;margin:0}
+.ep-sl li{display:flex;gap:8px;align-items:flex-start;font-size:13px;color:var(--ink);padding:5px 0;border-bottom:.5px solid var(--line)}
+.ep-sl .sl-lev{display:block;font-size:12px;color:var(--ink-2);margin-top:1px}
+.ep-as{margin:0;padding-left:18px}
+.ep-as li{font-size:13px;color:var(--ink-2);line-height:1.5;margin-bottom:7px}
+.ep-table{width:100%;border-collapse:collapse;margin-top:4px}
+.ep-table th{text-align:left;font-size:10.5px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-3);border-bottom:1px solid var(--line-2);padding:7px 9px 7px 0;vertical-align:bottom}
+.ep-table td{font-size:12.5px;color:var(--ink);border-bottom:.5px solid var(--line);padding:9px 9px 9px 0;vertical-align:top;line-height:1.4}
+.ep-table .td-step{font-weight:600;white-space:nowrap}
+.ep-table .lvl{display:inline-block;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.03em;padding:2px 7px;border-radius:999px;background:var(--surface-2);color:var(--ink-2);margin-top:3px}
+.sens{font-style:normal;font-weight:500;font-size:9px;text-transform:none;letter-spacing:0;color:var(--accent);background:var(--accent-soft);border:.5px solid var(--accent-line);border-radius:999px;padding:1px 6px;margin-left:6px;vertical-align:middle}
+.meas-list{margin-top:4px}
+.meas-block{border:.5px solid var(--line);border-radius:10px;padding:10px 12px 11px;margin-bottom:9px;break-inside:avoid}
+.mb-head{display:flex;align-items:center;gap:8px;margin-bottom:7px}
+.mb-head strong{font-size:13px;color:var(--ink)}
+.mb-head .lvl{margin-top:0}
+.mb-tim{margin-left:auto;font-size:11px;color:var(--ink-3)}
+.mb-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px 18px}
+.mb-f{min-width:0}
+.mb-wide{grid-column:1 / -1}
+.mb-lab{display:block;font-size:9.5px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-3);margin-bottom:1px}
+.mb-f p{margin:0;font-size:12px;color:var(--ink);line-height:1.38}
+.static-ring{position:relative;margin:0 auto 8px}
+.sr-svg{position:absolute;left:0;top:0;pointer-events:none}
+.sr-act{position:absolute;transform:translate(-50%,-50%);display:flex;align-items:center;gap:6px;width:152px;background:var(--surface);border:1px solid var(--primary-line);border-radius:8px;padding:5px 8px}
+.sr-act .n{flex:none;width:17px;height:17px;border-radius:50%;background:var(--primary-soft);color:var(--primary-deep);font-size:10px;font-weight:600;display:flex;align-items:center;justify-content:center}
+.sr-act .l{font-size:10.5px;color:var(--ink);line-height:1.15;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sr-card{position:absolute;transform:translate(-50%,-50%);max-width:120px;background:var(--surface);border:.5px solid var(--line);border-left:3px solid var(--ink-3);border-radius:7px;padding:5px 8px;font-size:10.5px;font-weight:600;color:var(--ink);line-height:1.15;box-shadow:0 1px 4px rgba(35,33,30,.08)}
+
+/* ===== UX density pass: chips, grids, modal, collapsible palette ===== */
+.container{padding-top:22px;padding-bottom:28px}
+.title{font-size:24px;margin-bottom:5px}
+.lede{margin-bottom:12px;font-size:14px}
+.tip{padding:9px 12px;margin-bottom:14px}
+.split{min-height:auto}
+.colmain{padding:22px}
+
+.ring-side{width:238px}
+.ring-work{display:flex;gap:22px;align-items:flex-start;flex-wrap:wrap;max-width:1160px}
+.ring-build{flex:none;width:640px;max-width:100%}
+.ring-build .ring-canvas{margin:0}
+.ring-key{flex:1 1 280px;min-width:280px;max-width:none;margin:0;border:.5px solid var(--line);border-radius:var(--r-m);background:var(--surface);padding:14px 16px;align-self:flex-start}
+.ring-key .section-h{margin-top:0}
+.ring-card.unlinked{outline:1.6px dashed var(--accent);outline-offset:1px}
+@media (max-width:1180px){.ring-key{flex-basis:100%}}
+.dom-group{margin-bottom:6px}
+.dom-toggle{display:flex;align-items:center;gap:8px;width:100%;text-align:left;border:.5px solid var(--line);background:var(--surface);border-radius:8px;padding:8px 10px;cursor:pointer;color:var(--ink-2)}
+.dom-toggle:hover{background:var(--surface-2)}
+.dom-toggle:focus-visible{outline:none;box-shadow:0 0 0 3px var(--primary-soft)}
+.dom-label{flex:1;font-size:12.5px;font-weight:600}
+.dom-count{font-size:11px;color:var(--ink-3);font-weight:600}
+.dom-chev2{color:var(--ink-3);transition:transform .15s;display:inline-flex;line-height:0}
+.dom-chev2.o{transform:rotate(90deg)}
+.dom-chev2 .icon{width:15px;height:15px}
+.dom-steps{padding:6px 0 4px 2px;display:flex;flex-direction:column;gap:5px}
+.palette-step{padding:7px 10px;margin-bottom:0}
+.palette-step .ps-name{font-size:12.5px}
+
+.lev-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:12px}
+.lev-card{margin:0;padding:13px 15px}
+.lev-head{margin-bottom:9px}
+.chip-wrap{display:flex;flex-wrap:wrap;gap:6px}
+.chip{display:inline-flex;align-items:center;gap:5px;font-size:12.5px;font-weight:500;color:var(--ink);background:var(--surface);border:.5px solid var(--line-2);border-radius:999px;padding:5px 11px;cursor:pointer;line-height:1.2}
+.chip:hover{background:var(--surface-2)}
+.chip:focus-visible{outline:none;box-shadow:0 0 0 3px var(--primary-soft)}
+.chip.on{color:#fff;font-weight:600}
+.chip-ck{display:inline-flex;line-height:0}
+.chip-ck .icon{width:12px;height:12px}
+
+.ind-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(272px,1fr));gap:10px}
+.ind-cell{display:flex;align-items:stretch;border:.5px solid var(--line);border-radius:var(--r-m);background:var(--surface);overflow:hidden}
+.ind-cell.off{opacity:.5;background:var(--surface-2)}
+.ind-cb{flex:none;align-self:center;margin:0 0 0 12px;width:16px;height:16px;accent-color:var(--primary);cursor:pointer}
+.ind-main{flex:1;min-width:0;text-align:left;border:0;background:transparent;cursor:pointer;padding:10px 13px;display:flex;flex-direction:column;gap:5px}
+.ind-main:hover{background:var(--surface-2)}
+.ind-row1{display:flex;align-items:center;gap:7px;min-width:0}
+.ind-row1 strong{font-size:13.5px;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ind-row2{display:flex;align-items:center;gap:8px}
+.ind-tim{font-size:11px;color:var(--ink-3)}
+.ind-count{margin-bottom:12px}
+.lvl{display:inline-block;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.03em;padding:2px 8px;border-radius:999px;background:var(--surface-2);color:var(--ink-2)}
+
+.modal-overlay{position:fixed;inset:0;background:rgba(20,30,26,.42);display:flex;align-items:center;justify-content:center;padding:20px;z-index:50}
+.modal{background:var(--surface);border-radius:var(--r-l);width:100%;max-width:460px;box-shadow:0 18px 50px rgba(20,30,26,.3);overflow:hidden;animation:pop .14s ease-out}
+@keyframes pop{from{transform:scale(.96);opacity:0}to{transform:scale(1);opacity:1}}
+.modal-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:14px 18px;border-bottom:.5px solid var(--line)}
+.modal-head h3{font-size:16px;font-weight:600;margin:0;color:var(--ink)}
+.modal-body{padding:16px 18px}
+.modal-q{font-size:14px;color:var(--ink-2);margin:0 0 10px;line-height:1.45}
+.modal-body textarea{font-size:14px}
+.md-field{margin-bottom:12px}
+.md-field:last-child{margin-bottom:0}
+.md-field p{margin:3px 0 0;font-size:13.5px;color:var(--ink);line-height:1.45}
+.modal-foot{display:flex;align-items:center;justify-content:flex-end;gap:9px;padding:12px 18px;border-top:.5px solid var(--line);background:var(--surface-2)}
+.modal-meta{font-size:12px;color:var(--ink-3);margin-right:auto}
+
+@media (max-width:680px){
+  .modal{max-width:none}
+  .lev-grid,.ind-grid{grid-template-columns:1fr}
+}
+
+@media print{
+  .topbar,.footer,.no-print,.export-toolbar,.tip{display:none!important}
+  body,.main,.shell,.container{background:#fff!important}
+  .container{max-width:none;padding:0}
+  .export-page{border:0;box-shadow:none;border-radius:0;margin:0;padding:0;max-width:none;page-break-after:always}
+  .export-page:last-child{page-break-after:auto}
+  .static-ring{page-break-inside:avoid}
+}
+
+@media (max-width:860px){
+  .hero{grid-template-columns:1fr}
+  .hero-right{min-height:62vh;border-left:0;border-top:.5px solid var(--line);order:2}
+  .hero-left{order:1;max-width:none;padding:46px 7vw}
+  .ring-stage{transform:scale(.74)}
+  .steps{grid-template-columns:1fr}
+}
+@media (max-width:680px){
+  .split{flex-direction:column}
+  .side{width:auto;border-right:0;border-bottom:.5px solid var(--line)}
+  .stepname{display:none}
+  .ring-stage{transform:scale(.62)}
+}
+@media (prefers-reduced-motion:reduce){
+  .rotor,.counter{animation:none!important}
+  *{transition:none!important}
+}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.3.1/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.3.1/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.24.7/babel.min.js"></script>
+<script type="text/babel">
+const {useState,useEffect,useRef} = React;
+
+/* ---------- storage ---------- */
+const mem={};
+const store={
+  async get(k){ if(k in mem)return mem[k]; try{ if(window.storage){ const r=await window.storage.get(k); if(r&&typeof r.value==='string'){ const v=JSON.parse(r.value); mem[k]=v; return v; } } }catch(e){} return null; },
+  async set(k,v){ mem[k]=v; try{ if(window.storage) await window.storage.set(k,JSON.stringify(v)); }catch(e){} },
+  async del(k){ delete mem[k]; try{ if(window.storage) await window.storage.delete(k); }catch(e){} }
+};
+const uid=()=>'p'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+const fmt=(ts)=>{const d=Math.floor((Date.now()-ts)/86400000);if(d<=0)return'today';if(d===1)return'yesterday';if(d<7)return d+' days ago';if(d<14)return'last week';return Math.floor(d/7)+' weeks ago';};
+
+/* ---------- content ---------- */
+const TEMPLATES={
+  'tamariki-ora':{name:'Tamariki Ora',type:'Tamariki Ora / child and whānau checks',acts:['Whānau identification and outreach','First whānau check','Developmental, health and wellbeing conversation','Advice, referral and practical support','Follow-up and relationship continuity','Transition to ongoing care or wider support'],primary:['KAW-01','KAW-02','RIT-01','SYS-01','SYS-03','AHU-04']},
+  'navigation':{name:'Navigation service',type:'Navigation / connector service',acts:['Trusted entry','Barrier diagnosis','Warm handover / active connection','Follow-through and self-navigation'],primary:['KAW-01','SYS-01','SYS-02','SYS-03']},
+  'housing':{name:'Housing stability',type:'Housing stability pathway',acts:['Immediate housing pressure response','Housing condition change','Stability and planning'],primary:['AHU-01','MAT-01','MAT-03']},
+  'whanau-ora':{name:'Whānau ora',type:'Whānau ora planning',acts:['Relational start and whānau aspirations','Whānau-led plan','Support, resources and follow-through'],primary:['KAW-01','KAW-03','KAW-04']},
+  'crisis':{name:'Crisis response',type:'Crisis response to upstream support',acts:['Immediate relief','Prevent escalation','Create the next pathway'],primary:['AHU-01','AHU-02','AHU-04']}
+};
+const EXAMPLES=[
+  {key:'tamariki-ora',label:'Tamariki Ora',blurb:'Child & whānau wellbeing checks',setup:{population:'pēpi, tamariki and their whānau',need:'Whānau with young children can miss early support, and some face barriers to regular wellbeing checks.',mainChange:'Whānau stay connected to timely, culturally safe support so tamariki thrive in their early years.'}},
+  {key:'navigation',label:'Navigation service',blurb:'Connecting whānau to the right support',setup:{population:'whānau navigating complex services',need:'People bounce between services and lose momentum at hand-off points.',mainChange:'Whānau reach the right support quickly and grow confident navigating it themselves.'}},
+  {key:'housing',label:'Housing stability',blurb:'From housing pressure to a stable home',setup:{population:'whānau facing housing insecurity',need:'Housing stress undermines health, work and tamariki wellbeing.',mainChange:'Whānau move from housing pressure to a stable, healthy home base.'}},
+  {key:'whanau-ora',label:'Whānau ora',blurb:'Whānau-led planning and aspirations',setup:{population:'whānau setting their own aspirations',need:'Support is often fragmented and not led by whānau themselves.',mainChange:'Whānau lead their own plan and build collective wellbeing.'}},
+  {key:'crisis',label:'Crisis response',blurb:'From crisis to an upstream pathway',setup:{population:'whānau in acute crisis',need:'Crisis support often stops at immediate relief without a path forward.',mainChange:'Whānau move from crisis to stability and a pathway upstream.'}}
+];
+const PROG_TYPES=['Tamariki Ora / child and whānau checks','Navigation / connector service','Housing stability pathway','Whānau ora planning','Crisis response to upstream support'];
+const STEPS=['Setup','Pathway','Causal ring','Levers','Indicators','Narrative','Review','Export'];
+const NEXT_LABEL=['Pathway','Causal steps','Levers','Indicators','Narrative','Review','Export','Done'];
+const USERS=[
+  {nm:'Sam Selwyn',em:'sam@hurahia.test',st:'approved'},
+  {nm:'Internal tester',em:'tester@hurahia.test',st:'approved'},
+  {nm:'Pending tester',em:'pending@hurahia.test',st:'pending'}
+];
+const DOMAINS=[
+  {key:'kawa',label:'Kawa · Human potential'},
+  {key:'systemic',label:'Tikanga · Systemic'},
+  {key:'material',label:'Tikanga · Material'},
+  {key:'behaviour',label:'Ritenga · Behavioural'},
+  {key:'symptomatic',label:'Āhuatanga · Symptomatic'}
+];
+const STEPS_LIB=[
+  {id:'KAW-01',d:'kawa',name:'Doorway',desc:'A relevant, trusted and accessible point of entry.'},
+  {id:'KAW-02',d:'kawa',name:'Turning point',desc:'Aspiration, agency, belief or identity is activated.'},
+  {id:'KAW-03',d:'kawa',name:'Trajectory shift',desc:'People change course and set a new direction.'},
+  {id:'KAW-04',d:'kawa',name:'Scaffolds',desc:'Supports and conditions help sustain progress.'},
+  {id:'KAW-05',d:'kawa',name:'Snowball',desc:'Gains spread across multiple parts of life.'},
+  {id:'SYS-01',d:'systemic',name:'Breakthrough',desc:'Whānau reach support that was hard to access.'},
+  {id:'SYS-02',d:'systemic',name:'Initial uptake',desc:'Early system steps happen with support around them.'},
+  {id:'SYS-03',d:'systemic',name:'Sustained engagement',desc:'Whānau keep accessing services over time.'},
+  {id:'SYS-04',d:'systemic',name:'Compounding outcomes',desc:'System access unlocks further cumulative gains.'},
+  {id:'MAT-01',d:'material',name:'Material change',desc:'A tangible improvement in material conditions.'},
+  {id:'MAT-02',d:'material',name:'Resilience growth',desc:'More stability strengthens whānau resilience.'},
+  {id:'MAT-03',d:'material',name:'Agency growth',desc:'Stability creates room to plan, choose and act.'},
+  {id:'MAT-04',d:'material',name:'Durable outcomes',desc:'Material security holds over the long term.'},
+  {id:'RIT-01',d:'behaviour',name:'Ignition',desc:'Motivation or readiness for change is sparked.'},
+  {id:'RIT-02',d:'behaviour',name:'Decision',desc:'Whānau choose and commit to a next step.'},
+  {id:'RIT-03',d:'behaviour',name:'Habit',desc:'New behaviours become repeated and normalised.'},
+  {id:'RIT-04',d:'behaviour',name:'Outcome accumulation',desc:'Repeated behaviours compound into impact.'},
+  {id:'AHU-01',d:'symptomatic',name:'Immediate relief',desc:'Crisis or direct support relieves pressure.'},
+  {id:'AHU-02',d:'symptomatic',name:'Avoid negative path',desc:'Harm or escalation is stopped or reduced.'},
+  {id:'AHU-03',d:'symptomatic',name:'Stability restored',desc:'Lived reality stabilises; pressure eases.'},
+  {id:'AHU-04',d:'symptomatic',name:'Foundation for future change',desc:'Stabilisation opens space for upstream change.'}
+];
+const STEP_BY_ID={}; STEPS_LIB.forEach((s,i)=>{STEP_BY_ID[s.id]={...s,order:i};});
+const ORBIT=[{l:'Doorway',d:'kawa'},{l:'Turning point',d:'kawa'},{l:'Breakthrough',d:'systemic'},{l:'Sustained engagement',d:'systemic'},{l:'Decision',d:'behaviour'},{l:'Habit',d:'behaviour'},{l:'Ignition',d:'behaviour'},{l:'Foundation',d:'symptomatic'}];
+const DOM_NAME={kawa:'Human potential',systemic:'Systemic',material:'Material',behaviour:'Behavioural',symptomatic:'Symptomatic'};
+const CENTER=['Whānau outreach','First check','Health & wellbeing','Advice & support','Follow-up','Transition'];
+
+const LEVERS=[
+  {id:'LEV-KAW-01',d:'kawa',name:'Belonging-building environments',q:'How does this activity help people feel valued, recognised or able to belong?'},
+  {id:'LEV-KAW-02',d:'kawa',name:'Stretch roles & meaningful contribution',q:'What responsibility, contribution or capability-expanding role does this activity create?'},
+  {id:'LEV-KAW-03',d:'kawa',name:'Everyday agency & decision-making',q:'Where do people exercise meaningful choice, influence or decision-making?'},
+  {id:'LEV-KAW-04',d:'kawa',name:'Collective purpose & obligation',q:'What shared commitment or responsibility does this connect people to?'},
+  {id:'LEV-KAW-05',d:'kawa',name:'Narrative & social signalling environments',q:'What repeated messages or signals make a positive future feel normal, valued and possible?'},
+  {id:'LEV-SYS-01',d:'systemic',name:'Access & entry pathways',q:'What barrier is being reduced or removed from the entry pathway?'},
+  {id:'LEV-SYS-02',d:'systemic',name:'Service & practice redesign',q:'What part of service or practice is being adapted to better fit whānau realities?'},
+  {id:'LEV-SYS-03',d:'systemic',name:'Service integration & connected systems',q:'Which parts of the system are being connected so whānau are not carrying the fragmentation?'},
+  {id:'LEV-SYS-04',d:'systemic',name:'Product & service innovation',q:'What new product, service or operating model is being created because existing approaches are insufficient?'},
+  {id:'LEV-SYS-05',d:'systemic',name:'Rules & resource settings',q:'Which funding, policy, operational or commissioning setting is being changed?'},
+  {id:'LEV-MAT-01',d:'material',name:'Housing security',q:'What housing condition is becoming more stable, safe or appropriate?'},
+  {id:'LEV-MAT-02',d:'material',name:'Essential needs security',q:'Which essential need is becoming more reliable?'},
+  {id:'LEV-MAT-03',d:'material',name:'Labour market conditions',q:'What work or economic participation condition is being improved?'},
+  {id:'LEV-MAT-04',d:'material',name:'Distributive settings & arrangements',q:'What resource, wealth or benefit-sharing arrangement is being changed?'},
+  {id:'LEV-MAT-05',d:'material',name:'Place & environmental conditions',q:'What place or environmental condition is being improved?'},
+  {id:'LEV-RIT-01',d:'behaviour',name:'Awareness & understanding',q:'What understanding or awareness is being built?'},
+  {id:'LEV-RIT-02',d:'behaviour',name:'Capability building',q:'What skill, ability or competency is being developed?'},
+  {id:'LEV-RIT-03',d:'behaviour',name:'Practice & routine development',q:'What repeated practice or routine is being made easier to sustain?'},
+  {id:'LEV-RIT-04',d:'behaviour',name:'Applied participation & experience',q:'What real experience lets people apply learning and build confidence?'},
+  {id:'LEV-AHU-01',d:'symptomatic',name:'Immediate stabilisation, safety & relief',q:'What acute pressure, safety issue or immediate need is being relieved?'},
+  {id:'LEV-AHU-02',d:'symptomatic',name:'Connectivity & participation conditions',q:'What immediate condition enables connection, inclusion or participation?'},
+  {id:'LEV-AHU-03',d:'symptomatic',name:'Prevention & protective interventions',q:'What risk is being reduced and what protective factor is being strengthened?'},
+  {id:'LEV-AHU-04',d:'symptomatic',name:'Treatment & recovery interventions',q:'What treatment or recovery support is helping wellbeing improve?'}
+];
+const LEVER_BY_ID={}; LEVERS.forEach(l=>{LEVER_BY_ID[l.id]=l;});
+const leversFor=(d)=>LEVERS.filter(l=>l.d===d);
+
+const INDICATORS={
+  'KAW-01':{know:'Are we reaching the whānau we intend to, and does it feel resonant and accessible?',admin:'Compare who engages with the intended cohort; prior non-engagement; referrals to uptake. Check data availability and consent.',level:'Leading',timing:'Early',whanau:'Did this feel like something for you or your whānau? What made it easy or hard to step in?',signal:'Whānau return after first contact, bring others, low drop-off, early trust cues.',countable:'Reach-to-engagement; resonance; practical barrier score.',minSet:true},
+  'KAW-02':{know:'Did people begin to see their story, possibility or future differently?',admin:'No direct admin measure; later, test whether early turning-point signals predict downstream engagement, study, work or health.',level:'Leading',timing:'Early',whanau:'Do you see more possibilities for yourself or your whānau than before?',signal:'Future-oriented language, “I can” statements, new pride, emotional shift.',countable:'Hope / future orientation; self-story shift; “something shifted”.',minSet:false},
+  'KAW-03':{know:'Is the new sense of possibility becoming agency and action?',admin:'Possible proxies: new enrolments, training, employment steps, licensing, service uptake. Use cautiously and in context.',level:'Intermediate',timing:'Early–intermediate',whanau:'How much do you feel you can shape what happens next? What have you done differently?',signal:'Initiates contact, applies or enrols, speaks up, sets goals, acts across domains.',countable:'Agency score; self-initiated actions; goal or plan formed.',minSet:false},
+  'KAW-04':{know:'Is the shift being held through tough days, and how fast do people recover?',admin:'Reduced recurrence of crisis events; more stable service engagement; fewer acute presentations after setbacks.',level:'Intermediate',timing:'Intermediate',whanau:'What helps you keep going when things get hard?',signal:'Returns after missed appointments, asks for help earlier, names supports.',countable:'Support sufficiency; setback recovery; re-engagement after missed contact.',minSet:false},
+  'KAW-05':{know:'Are early shifts creating wider, reinforcing gains across life domains?',admin:'Bundle cross-domain admin data (education, income, employment, health, justice, housing) as correlation, not simple attribution.',level:'Durable',timing:'Intermediate–long',whanau:'Where else in your life or whānau has this made a difference?',signal:'Impacts beyond the programme — work, study, health, culture, relationships.',countable:'Cross-domain gains; domains improved at 3 / 6 / 12 months.',minSet:false},
+  'SYS-01':{know:'Did whānau break through a system barrier that previously blocked them?',admin:'Prior service-use and missed-engagement history; education, health, justice or welfare records. Compare before and after where feasible.',level:'Leading',timing:'Early',whanau:'Were you able to get through the door this time? What was different?',signal:'Warm handover completed, barrier removed, fewer bounced referrals.',countable:'First-time engagement; referral conversion; barrier resolved.',minSet:true},
+  'SYS-02':{know:'Are whānau staying engaged while support is wrapped around them?',admin:'Mostly programme and admin data in real time; service-event records may later confirm uptake.',level:'Leading',timing:'Early',whanau:'Was it easy enough to take the next step?',signal:'Completes forms, attends first appointments, accepts warm referrals.',countable:'Completion of first 2–3 steps; enrolment; appointment completion.',minSet:false},
+  'SYS-03':{know:'Does engagement continue after intensive support reduces?',admin:'Continuity of health, education and social-service engagement; fewer missed critical contacts where data exists.',level:'Intermediate',timing:'Intermediate',whanau:'Are you still connected to the support you needed? What helps you stay connected?',signal:'Books own appointments, follows up independently, engages before crisis.',countable:'Retention at 3 / 6 months; repeat attendance; self-navigation.',minSet:false},
+  'SYS-04':{know:'Did system access unlock other gains from within the system?',admin:'Reduced emergency or crisis use, fewer justice events, fewer emergency-housing episodes, better continuity where relevant.',level:'Durable',timing:'Intermediate–long',whanau:'Has getting this support helped other things fall into place?',signal:'Services coordinate, fewer repeat explanations, avoidable crises reduce.',countable:'Linked supports activated; reduced crisis contacts; continuity.',minSet:false},
+  'MAT-01':{know:'Did material conditions actually improve in ways whānau can feel?',admin:'Benefit, income and tax data, hardship grants, emergency housing, tenancy proxies and school moves where available.',level:'Leading',timing:'Early',whanau:'Which pressures feel lighter, the same, or heavier?',signal:'Rent / kai / transport issues resolved, fewer urgent requests, can participate.',countable:'Material pressure score; domains of pressure reduced; barrier removed.',minSet:true},
+  'MAT-02':{know:'Did material change reduce pressure and increase stability?',admin:'Reduced hardship grants, emergency accommodation, acute health presentations and income-volatility proxies.',level:'Intermediate',timing:'Intermediate',whanau:'Do things feel more stable than before? What feels less on edge?',signal:'Calmer routines, fewer urgent calls, can plan week-to-week.',countable:'Stability score; fewer crises; crisis recurrence interval.',minSet:false},
+  'MAT-03':{know:'Has material stability created room to plan, choose and act?',admin:'Transition into training or work, increased attendance, sustained appointments, fewer crisis events after stabilising.',level:'Intermediate',timing:'Intermediate',whanau:'Has this made it easier to make plans or follow through?',signal:'Takes next steps once pressure eases, attends work / study, sets goals.',countable:'Planning-space score; actions enabled by material change.',minSet:false},
+  'MAT-04':{know:'Are material gains holding over time, or do pressures keep recurring?',admin:'Longitudinal housing, hardship, income, school stability, health, crisis and justice records where relevant.',level:'Durable',timing:'Long-term',whanau:'Has this change held? What has stayed steadier over time?',signal:'Maintained tenancy / income / transport; reduced cycle of urgent support.',countable:'Stability sustained at 3 / 6 / 12 months; recurrence interval.',minSet:false},
+  'RIT-01':{know:'Was motivation or readiness to try something different sparked?',admin:'Mostly pulse and observation; proxies may include info-session attendance, enrolment enquiry or first participation.',level:'Leading',timing:'Early',whanau:'Has anything made you feel ready to try something different?',signal:'Asks questions, names a desired change, shows energy, explores options.',countable:'Readiness score; motivation score; first expression of intent.',minSet:false},
+  'RIT-02':{know:'Did the person or whānau choose a new course of action?',admin:'Enrolment, attendance, applications, licensing, training or employment steps, service registration. Confirm availability.',level:'Leading',timing:'Early',whanau:'What have you decided to do next? What is the first step?',signal:'Goal written or spoken, appointment made, application submitted.',countable:'Decision status; commitments made; confidence in decision.',minSet:true},
+  'RIT-03':{know:'Is the new behaviour becoming repeated and less dependent on prompting?',admin:'Attendance patterns, sustained study or work participation, health-check continuity, repeated positive service interactions.',level:'Intermediate',timing:'Intermediate',whanau:'Is this becoming part of how you normally do things? How often lately?',signal:'Turns up repeatedly, follows routine, maintains despite pressures.',countable:'Consistency; weeks sustained; reduced prompting.',minSet:true},
+  'RIT-04':{know:'Are repeated behaviours producing cumulative gains?',admin:'Attendance, achievement or credits, income and employment duration, health engagement, reduced crisis events where available.',level:'Durable',timing:'Intermediate–long',whanau:'What has built up over time because you kept doing this?',signal:'Describes progress from repetition, milestones reached, gains compound.',countable:'Accumulated gains; milestones reached; domain gains.',minSet:false},
+  'AHU-01':{know:'Was urgent pressure reduced quickly enough to matter?',admin:'Programme and admin data strongest; hardship grants, emergency housing and health or crisis use may show later, often delayed.',level:'Leading',timing:'Immediate',whanau:'Did this help with the immediate pressure? What came off first?',signal:'Kai / housing / transport / safety support delivered, distress reduced.',countable:'Need resolved; time to relief; urgent pressure reduced.',minSet:true},
+  'AHU-02':{know:'Was harm or escalation prevented or reduced?',admin:'Emergency housing, hospital or ED, justice or police, school disengagement, benefit disruption, Oranga Tamariki contact. Handle with strong ethics.',level:'Leading',timing:'Immediate–early',whanau:'What might have happened without this support?',signal:'Eviction prevented, escalation avoided, safety risk reduced.',countable:'Avoided escalation; risk before / after; harm avoided.',minSet:false},
+  'AHU-03':{know:'Has the whānau moved from acute crisis to steadier ground?',admin:'Reduced repeat acute service use, emergency assistance, ED or crisis presentations, police events, emergency-housing recurrence.',level:'Intermediate',timing:'Early',whanau:'Do things feel less urgent or more manageable now?',signal:'Fewer urgent contacts, routines restart, fewer presenting crises.',countable:'Manageability score; crisis frequency; stability restored.',minSet:true},
+  'AHU-04':{know:'Has stabilisation created readiness and space for upstream work?',admin:'Movement from crisis supports into planned services; education, work or training engagement; reduced crisis recurrence afterward.',level:'Intermediate',timing:'Early–intermediate',whanau:'Is there now space to think about what comes next?',signal:'Accepts referral, sets goal, shifts from urgent need to future direction.',countable:'Referral uptake; goal-setting; future-space score.',minSet:true}
+};
+
+/* ---------- narrative + coherence helpers ---------- */
+const byOrder=(a,b)=>((STEP_BY_ID[a.stepId]||{}).order||0)-((STEP_BY_ID[b.stepId]||{}).order||0);
+const cap=(s)=>s?s.charAt(0).toUpperCase()+s.slice(1):s;
+const lc=(s)=>{s=(s||'').trim();return s?s.charAt(0).toLowerCase()+s.slice(1):s;};
+const strip=(s)=>(s||'').trim().replace(/[.\s]+$/,'');
+function prose(arr){arr=arr.filter(Boolean);if(!arr.length)return'';if(arr.length===1)return arr[0];if(arr.length===2)return arr[0]+' and '+arr[1];return arr.slice(0,-1).join(', ')+', and '+arr[arr.length-1];}
+function placedSorted(p){return [...((p.ring&&p.ring.placed)||[])].sort(byOrder);}
+function selectedLevers(p){const out=[];placedSorted(p).forEach(pl=>{const sel=(p.levers||{})[pl.stepId]||{};Object.keys(sel).forEach(lid=>{if(LEVER_BY_ID[lid]&&out.indexOf(lid)===-1)out.push(lid);});});return out;}
+function buildNarrative(p){
+  const s=p.setup||{};const acts=(p.activities||[]).filter(a=>(a.label||'').trim());const placed=placedSorted(p);const paras=[];
+  let p1=(s.name||'This programme');
+  if(s.population)p1+=' works alongside '+strip(s.population);
+  p1+='.';
+  if(s.need)p1+=' It responds to '+lc(strip(s.need))+'.';
+  if(s.mainChange)p1+=' Its purpose is to support '+lc(strip(s.mainChange))+'.';
+  paras.push(p1);
+  if(acts.length)paras.push('In practice, the programme works through '+prose(acts.map(a=>lc(strip(a.label))))+'.');
+  if(placed.length){
+    const names=placed.map(pl=>lc((STEP_BY_ID[pl.stepId]||{}).name));
+    paras.push('These activities are designed to activate a connected sequence of change — '+prose(names)+'. Together, these steps describe how the programme helps whānau move from first contact toward lasting change.');
+    const levNames=selectedLevers(p).map(lid=>lc(LEVER_BY_ID[lid].name));
+    if(levNames.length)paras.push('It activates these steps through mechanisms such as '+prose(levNames)+'.');
+  }
+  return paras.join('\n\n');
+}
+function summarizeSelections(p){
+  const s=p.setup||{};const acts=(p.activities||[]).filter(a=>(a.label||'').trim());const placed=placedSorted(p);
+  let out='Programme name: '+(s.name||'(none)')+'\n';
+  out+='Works with: '+(s.population||'(none)')+'\n';
+  out+='Need it responds to: '+(s.need||'(none)')+'\n';
+  out+='Main change sought: '+(s.mainChange||'(none)')+'\n';
+  out+='Activities in order: '+(acts.map((a,i)=>(i+1)+'. '+a.label).join('; ')||'(none)')+'\n';
+  out+='Causal steps: '+(placed.map(pl=>(STEP_BY_ID[pl.stepId]||{}).name).join('; ')||'(none)')+'\n';
+  const mechs=[];placed.forEach(pl=>{const sel=(p.levers||{})[pl.stepId]||{};Object.keys(sel).forEach(lid=>{const L=LEVER_BY_ID[lid];if(L)mechs.push(L.name+(sel[lid]?(' — '+sel[lid]):''));});});
+  out+='Mechanisms / levers: '+(mechs.join('; ')||'(none)')+'\n';
+  return out;
+}
+async function aiImprove(p){
+  const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:1000,messages:[{role:'user',content:'You are helping a community organisation in Aotearoa New Zealand write the narrative for their theory of change. Using ONLY the structured selections below, write two or three short, warm, plain-language paragraphs in New Zealand English. Do not invent causal claims, indicators, levers or facts that are not in the selections. Do not use bullet points or headings.\n\n'+summarizeSelections(p)}]})});
+  const data=await res.json();
+  return (data.content||[]).filter(c=>c.type==='text').map(c=>c.text).join('\n').trim();
+}
+function checkCoherence(p){
+  const placed=placedSorted(p);const ids=placed.map(x=>x.stepId);const has=(id)=>ids.indexOf(id)!==-1;
+  const levs=selectedLevers(p);const indCount=placed.filter(pl=>((p.indicators||{})[pl.stepId]!==false)).length;const out=[];
+  if(placed.length>7)out.push({title:'A lot of causal steps',msg:'You have '+placed.length+' causal steps. A theory of change usually reads most clearly when it leans on a few primary steps.',fix:'Keep the steps the programme is deliberately designed to activate, and trim or set the rest aside.',step:2});
+  if(has('RIT-03')&&!(has('RIT-02')||levs.indexOf('LEV-RIT-02')!==-1||levs.indexOf('LEV-RIT-03')!==-1))out.push({title:'Habit without a decision or routine',msg:'You have included Habit, but a new habit usually needs a decision point and a practice or routine to form.',fix:'Add the Decision step, or tick a capability-building or practice-and-routine lever.',step:2});
+  if(has('MAT-03')&&!(has('MAT-01')||has('MAT-02')))out.push({title:'Agency growth without a material bridge',msg:'Agency growth from material stability usually needs a material change or resilience step underneath it.',fix:'Add Material change or Resilience growth, or note the enabling condition.',step:2});
+  if(has('KAW-05')&&!(has('KAW-03')||has('KAW-04')))out.push({title:'Snowball without an earlier gain',msg:'Snowball describes gains spreading. It usually needs an earlier shift that can compound.',fix:'Add an intermediate Kawa step such as Trajectory shift or Scaffolds.',step:2});
+  if(placed.length>0&&levs.length===0)out.push({title:'No mechanisms chosen yet',msg:'Your causal steps do not yet have any levers ticked, so the narrative cannot say how the programme activates them.',fix:'On the Levers step, tick the mechanisms your programme uses for each step.',step:3});
+  if(indCount>12)out.push({title:'A heavy measurement set',msg:indCount+' indicators may be too much for a practical one-page scaffold.',fix:'On the Indicators step, keep the minimum set and make the rest optional.',step:4});
+  if(placed.length>0&&indCount===0)out.push({title:'No indicators selected',msg:'Without any indicators, the measurement summary will be empty.',fix:'On the Indicators step, keep a few of the recommended measures.',step:4});
+  return out;
+}
+function deriveAssumptions(p){
+  const s=p.setup||{};const name=s.name||'the programme';const pop=strip(s.population)||'whānau';
+  return [
+    cap(pop)+' will engage with '+name+' when it is offered in a way that feels relevant, safe and accessible.',
+    'The causal steps chosen reflect how change actually happens for the '+pop+' this programme works with.',
+    'The mechanisms named are within the programme\u2019s influence and are applied consistently enough to take effect.'
+  ];
+}
+
+/* ---------- icons ---------- */
+const I={
+  plus:<svg className="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M12 5v14M5 12h14"/></svg>,
+  pencil:<svg className="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>,
+  trash:<svg className="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14"/></svg>,
+  up:<svg className="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 15l-6-6-6 6"/></svg>,
+  down:<svg className="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 9l6 6 6-6"/></svg>,
+  left:<svg className="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>,
+  right:<svg className="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>,
+  chev:<svg className="icon chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 6l6 6-6 6"/></svg>,
+  check:<svg className="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6L9 17l-5-5"/></svg>,
+  bulb:<svg className="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-4 10.4c.6.6 1 1.4 1 2.1h6c0-.7.4-1.5 1-2.1A6 6 0 0 0 12 3Z"/></svg>,
+  x:<svg className="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>,
+  help:<svg className="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="9.2"/><path d="M9.3 9.3a2.8 2.8 0 0 1 5.4 1c0 1.9-2.7 2.3-2.7 4"/><path d="M12 17.3h.01"/></svg>
+};
+const Glyph=({c='#fff',s=22})=>(
+  <svg width={s} height={s} viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <circle cx="12" cy="12" r="8.4" stroke={c} strokeWidth="1.5" opacity=".95"/>
+    <path d="M5.6 12h12.8" stroke={c} strokeWidth="1.3" opacity=".55"/>
+    <circle cx="6.6" cy="12" r="1.7" fill={c}/><circle cx="12" cy="12" r="1.7" fill={c}/><circle cx="17.4" cy="12" r="1.7" fill={c}/>
+  </svg>
+);
+const Tile=({s})=> <span className="tile" style={s?{width:s,height:s}:null}><Glyph s={s?s*.58:22}/></span>;
+
+function Tip({id,dismissed,onDismiss,children}){
+  if(dismissed.indexOf(id)!==-1) return null;
+  return (<div className="tip"><span className="tip-ic">{I.bulb}</span><span className="tip-tx">{children}</span><button className="tip-x" onClick={()=>onDismiss(id)} aria-label="Dismiss tip" title="Dismiss">{I.x}</button></div>);
+}
+
+/* ============ LANDING ============ */
+function ShowcaseRing(){
+  const R=188;
+  return (
+    <div className="ring-stage" aria-hidden="true">
+      <div className="ring-glow"></div><div className="ring-guide"></div><div className="ring-guide two"></div>
+      <div className="rotor">
+        {ORBIT.map((c,i)=>{const a=(i/ORBIT.length)*2*Math.PI;const x=R*Math.sin(a),y=-R*Math.cos(a);return (
+          <div className="slot" key={i} style={{marginLeft:x,marginTop:y}}><div className="counter"><div className="ocard" style={{borderLeftColor:'var(--'+c.d+')'}}>{c.l}<span className="dom">{DOM_NAME[c.d]}</span></div></div></div>
+        );})}
+      </div>
+      <div className="ring-center"><div className="ttl">The pathway</div><div className="cgrid">{CENTER.map((b,i)=><div className="cbox" key={i}>{b}</div>)}</div></div>
+    </div>
+  );
+}
+function Landing({onSignIn}){
+  const [email,setEmail]=useState('sam@hurahia.test');
+  const pick=(u)=>{ setEmail(u.em); if(u.st==='approved') onSignIn(u); };
+  return (
+    <div>
+      <div className="hero">
+        <div className="hero-left">
+          <div className="lockup"><Tile/><span className="wordmark">Whiria Ngā Ara<small>Theory of change</small></span></div>
+          <div className="eyebrow">A weaving of pathways</div>
+          <h1 className="disp">Weave your programme into a <em>theory of change</em></h1>
+          <p className="sub">A calm, guided way to turn what your programme actually does into a clear theory of change, a measurement plan, and a story you can export — without starting from a blank page.</p>
+          <div className="signin">
+            <label className="lbl" htmlFor="email">Email</label>
+            <input id="email" type="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder="you@example.com"/>
+            <button className="btn btn-primary btn-block" style={{marginTop:10}} onClick={()=>onSignIn({nm:email.split('@')[0],em:email})}>Sign in</button>
+            <div className="users">
+              {USERS.map(u=>(<button className="user" key={u.em} onClick={()=>pick(u)}><span><span className="nm">{u.nm}</span><span className="em">{u.em}</span></span><span className={"badge "+(u.st==='approved'?'ok':'wait')}>{u.st}</span></button>))}
+            </div>
+            <p className="note">New here? Tap an approved tester above to sign in instantly, or use any email. No password yet — real accounts arrive when the tool is hosted.</p>
+          </div>
+        </div>
+        <div className="hero-right">
+          <div className="ring-cap"><div className="k">A live example · Tamariki Ora</div><div className="pills"><span className="pill">6 activities</span><span className="pill">8 causal steps</span><span className="pill">measurement built in</span></div></div>
+          <ShowcaseRing/>
+        </div>
+      </div>
+      <div className="how"><div className="how-in">
+        <div className="eyebrow">How it works</div>
+        <h2 className="disp">Three steps, start to finish</h2>
+        <p className="lede">You're always shaping something that already exists — choosing and adjusting, never inventing from scratch.</p>
+        <div className="steps">
+          <div className="step"><span className="n">1</span><h3>Map what your programme does</h3><p>Add your real activities in order, or start from a template and adjust it to fit.</p></div>
+          <div className="step"><span className="n">2</span><h3>Show how the change happens</h3><p>Wrap your activities in causal steps and choose the levers behind each one.</p></div>
+          <div className="step"><span className="n">3</span><h3>Get your two one-pagers</h3><p>A clear theory of change and a measurement summary, ready to share and sign off.</p></div>
+        </div>
+      </div></div>
+      <div className="land-foot">Whiria Ngā Ara · prototype · saves in this browser</div>
+    </div>
+  );
+}
+
+/* ============ APP CHROME ============ */
+function TopBar({step,saved,lang,setLang,user,onHome,onSignOut,onHelp}){
+  return (
+    <div className="topbar">
+      <button className="brandbtn" onClick={onHome} title="Go to dashboard"><Tile s={32}/><span className="wm">Whiria Ngā Ara</span></button>
+      {step!=null && (<div className="stepper" role="img" aria-label={"Step "+(step+1)+" of 8, "+STEPS[step]}>{STEPS.map((s,i)=><span key={i} className={"dot"+(i===step?" on":i<step?" done":"")} aria-hidden="true"></span>)}<span className="stepname">{STEPS[step]} · {step+1} of 8</span></div>)}
+      <div className="bar-right">
+        {step!=null && <span className="saved">{saved?<>{I.check} Saved</>:""}</span>}
+        <button className="helpbtn" onClick={onHelp} aria-label="How to use" title="How to use Whiria Ngā Ara">{I.help}<span>Help</span></button>
+        <div className="lang" role="group" aria-label="Language"><button className={lang==='en'?'on':''} onClick={()=>setLang('en')}>English</button><button className={lang==='mi'?'on':''} onClick={()=>setLang('mi')}>Te Reo Māori</button></div>
+        {step==null && user && <span className="userchip"><span className="avatar">{(user.nm||'?')[0].toUpperCase()}</span><button className="btn btn-ghost" style={{padding:'5px 10px'}} onClick={onSignOut}>Sign out</button></span>}
+      </div>
+    </div>
+  );
+}
+function Footer({step,onBack,onNext}){
+  return (<div className="footer"><button className="btn btn-ghost" onClick={onBack}>{I.left} Back</button><button className="btn btn-primary" onClick={onNext}>Next: {NEXT_LABEL[step]} {I.right}</button></div>);
+}
+
+/* ============ SCREENS ============ */
+function Dashboard({index,user,onNew,onExample,onOpen,onDelete,dismissed,onDismiss,onHelp}){
+  return (
+    <div className="container">
+      <div className="dash-head">
+        <div><h1 className="title disp">Kia ora{user&&user.nm?', '+user.nm.split(' ')[0]:''}</h1><p className="hint" style={{marginTop:2}}>Open a ready-made theory of change and adapt it, or start a new one.</p></div>
+        <button className="btn btn-primary" onClick={onNew}>{I.plus} New theory of change</button>
+      </div>
+      <WhyBox step="dashboard" onHelp={onHelp} dismissed={dismissed} onDismiss={onDismiss}/>
+      <div className="section-h"><h2>Start from an example</h2></div>
+      <p className="sub-muted">Each one opens already filled in — setup, pathway and causal ring — so you begin with something real to adjust, not a blank page.</p>
+      <div className="ex-grid">
+        {EXAMPLES.map(e=>(<button className="ex-card" key={e.key} onClick={()=>onExample(e.key)}><span className="exn">{e.label}</span><span className="exb">{e.blurb}</span><span className="exs">Open &amp; adapt {I.right}</span></button>))}
+      </div>
+      <div className="section-h"><h2>Your theories of change</h2></div>
+      {index.length===0 ? (<p className="sub-muted">Nothing saved yet — open an example above, or create a new one.</p>) : index.map(e=>(
+        <div className="toc-card" key={e.id}><div style={{minWidth:0}}><p className="toc-name" onClick={()=>onOpen(e.id)}>{e.name||'Untitled theory of change'}</p><p className="toc-meta">{(e.type||'No type yet')+' · edited '+fmt(e.updatedAt)}</p></div><div className="toc-actions"><button className="iconbtn" title="Open" aria-label="Open" onClick={()=>onOpen(e.id)}>{I.pencil}</button><button className="iconbtn" title="Delete" aria-label="Delete" onClick={()=>onDelete(e.id)}>{I.trash}</button></div></div>
+      ))}
+    </div>
+  );
+}
+function Setup({p,setField,reo,dismissed,onDismiss,onHelp}){
+  return (
+    <div className="container">
+      {reo && <p className="banner">Showing English. Your team's verified te reo Māori slots in here — content isn't machine-translated.</p>}
+      <h1 className="title disp">Tell us about your programme</h1>
+      <p className="lede">A few plain-language details. Nothing technical — this just shapes your draft narrative and measurement suggestions later.</p>
+      <WhyBox step={0} onHelp={onHelp} dismissed={dismissed} onDismiss={onDismiss}/>
+      <div className="field"><label className="label" htmlFor="f-name">Programme name</label><input id="f-name" type="text" value={p.setup.name} onChange={e=>setField('name',e.target.value)} placeholder="e.g. Tamariki Ora — South Auckland"/></div>
+      <div className="field"><label className="label" htmlFor="f-pop">Who the programme works with</label><input id="f-pop" type="text" value={p.setup.population} onChange={e=>setField('population',e.target.value)} placeholder="e.g. pēpi, tamariki and their whānau"/></div>
+      <div className="field"><label className="label" htmlFor="f-need">The need or opportunity it responds to</label><textarea id="f-need" rows="2" value={p.setup.need} onChange={e=>setField('need',e.target.value)} placeholder="In a sentence or two…"/></div>
+      <div className="field"><label className="label" htmlFor="f-change">The main change it's trying to support</label><textarea id="f-change" rows="2" value={p.setup.mainChange} onChange={e=>setField('mainChange',e.target.value)} placeholder="In a sentence or two…"/></div>
+      <div className="field"><label className="label" htmlFor="f-type">Programme type or setting</label><select id="f-type" value={p.setup.type} onChange={e=>setField('type',e.target.value)}><option value="">Choose a type…</option>{PROG_TYPES.map(t=><option key={t} value={t}>{t}</option>)}</select></div>
+      <div className="field"><label className="label" htmlFor="f-ctx">Any context or assumptions <span className="hint">(optional)</span></label><textarea id="f-ctx" rows="2" value={p.setup.context} onChange={e=>setField('context',e.target.value)} placeholder="Anything that helps explain the programme…"/></div>
+    </div>
+  );
+}
+function Pathway({p,add,setAct,del,move,applyTpl,dismissed,onDismiss,onHelp}){
+  const n=p.activities.length;
+  return (
+    <div className="split">
+      <div className="side">
+        <p className="eyebrow2">Start from a template</p>
+        {Object.entries(TEMPLATES).map(([k,t])=><button key={k} className="tpl" onClick={()=>applyTpl(k)}>{t.name}</button>)}
+        <div className="or"><i></i><span>or</span><i></i></div>
+        <p className="hint">Build your own using “Add a step”.</p>
+      </div>
+      <div className="colmain">
+        <h1 className="title disp">What your programme does</h1>
+        <p className="lede">List the practical things your programme does, in the order they happen. You'll wrap these in causal steps next.</p>
+        <WhyBox step={1} onHelp={onHelp} dismissed={dismissed} onDismiss={onDismiss}/>
+        <div className="pathlist">
+          {p.activities.map((a,i)=>(
+            <React.Fragment key={a.id}>
+              <div className="act"><span className="num">{i+1}</span><input type="text" value={a.label} placeholder={"Describe step "+(i+1)} aria-label={"Step "+(i+1)} onChange={e=>setAct(a.id,e.target.value)}/><span className="tools"><button className="iconbtn" title="Move up" aria-label="Move up" disabled={i===0} onClick={()=>move(a.id,-1)}>{I.up}</button><button className="iconbtn" title="Move down" aria-label="Move down" disabled={i===n-1} onClick={()=>move(a.id,1)}>{I.down}</button><button className="iconbtn" title="Remove step" aria-label="Remove step" onClick={()=>del(a.id)}>{I.trash}</button></span></div>
+              {i<n-1 && <div className="conn" aria-hidden="true">{I.down}</div>}
+            </React.Fragment>
+          ))}
+          <button className="addstep" onClick={add}>{I.plus} Add a step</button>
+        </div>
+        {n===0 && <p className="hint" style={{marginTop:14}}>Add your first step above, or pick a template on the left to start from a ready-made pathway.</p>}
+      </div>
+    </div>
+  );
+}
+
+/* ---------- Causal ring builder (step 3) ---------- */
+function CausalRing({p,addStep,removeStep,toggleLink,dismissed,onDismiss,onHelp}){
+  const [sel,setSel]=useState(null);
+  const [openDom,setOpenDom]=useState({kawa:true});
+  const [pending,setPending]=useState(null);
+  const addAndSelect=(stepId)=>{addStep(stepId);setPending(stepId);};
+  const acts=p.activities||[];
+  const ring=p.ring||{placed:[]};
+  const placed=[...ring.placed].sort((a,b)=>((STEP_BY_ID[a.stepId]||{}).order||0)-((STEP_BY_ID[b.stepId]||{}).order||0));
+  const placedIds={}; placed.forEach(x=>placedIds[x.stepId]=true);
+  useEffect(()=>{ if(pending){ const pl=placed.find(x=>x.stepId===pending); if(pl){ setSel(pl.pid); setPending(null); } } },[pending,placed.length]);
+  const W=640,H=520,cx=W/2,cy=H/2,rx=250,ry=200;
+  const boxH=36,gap=8; const totalH=acts.length*boxH+Math.max(acts.length-1,0)*gap; const startY=cy-totalH/2+boxH/2;
+  const actPos={}; acts.forEach((a,i)=>{actPos[a.id]={x:cx,y:startY+i*(boxH+gap)};});
+  const m=placed.length; const cardPos={}; placed.forEach((pl,k)=>{const ang=(k/Math.max(m,1))*2*Math.PI;cardPos[pl.pid]={x:cx+rx*Math.sin(ang),y:cy-ry*Math.cos(ang)};});
+  const selPlaced=placed.find(x=>x.pid===sel)||null;
+
+  return (
+    <div className="split">
+      <div className="side ring-side">
+        <p className="eyebrow2" style={{marginBottom:8}}>Causal steps</p>
+        {DOMAINS.map(dom=>{
+          const steps=STEPS_LIB.filter(s=>s.d===dom.key);
+          const added=steps.filter(s=>placedIds[s.id]).length;
+          const isOpen=!!openDom[dom.key];
+          return (
+            <div key={dom.key} className="dom-group">
+              <button className="dom-toggle" onClick={()=>setOpenDom(o=>({...o,[dom.key]:!o[dom.key]}))} aria-expanded={isOpen}>
+                <span className="dom-dot" style={{background:'var(--'+dom.key+')'}}></span>
+                <span className="dom-label">{dom.label}</span>
+                <span className="dom-count">{added?added+'/':''}{steps.length}</span>
+                <span className={"dom-chev2"+(isOpen?' o':'')}>{I.chev}</span>
+              </button>
+              {isOpen && <div className="dom-steps">
+                {steps.map(s=>{const a=!!placedIds[s.id];return (
+                  <button key={s.id} className={"palette-step"+(a?' added':'')} disabled={a} onClick={()=>addAndSelect(s.id)} style={{borderLeftColor:'var(--'+dom.key+')'}} title={s.desc}>
+                    <span className="ps-name">{s.name}{a&&I.check}</span>
+                  </button>
+                );})}
+              </div>}
+            </div>
+          );
+        })}
+      </div>
+      <div className="colmain">
+        <h1 className="title disp">Wrap your pathway in its change logic</h1>
+        <p className="lede">Add the causal steps your programme sets off, then link each to the activities that drive it.</p>
+        <WhyBox step={2} onHelp={onHelp} dismissed={dismissed} onDismiss={onDismiss}/>
+        <div className="ring-work">
+          <div className="ring-build">
+            <div className="ring-instruct">{selPlaced ? (<><span>Linking <strong>{(STEP_BY_ID[selPlaced.stepId]||{}).name}</strong> — click an activity to link or unlink it.</span><button className="linkclear" onClick={()=>setSel(null)}>Done</button></>) : <span>Click a step on the ring to start linking it to your activities.</span>}</div>
+            <div className="ring-canvas-wrap">
+              <div className="ring-canvas" style={{width:W,height:H}}>
+                <div className="ring-amb" aria-hidden="true"></div>
+                <div className="ring-orbit-guide" aria-hidden="true"></div>
+                <svg className="ring-svg" viewBox={"0 0 "+W+" "+H} width={W} height={H}>
+                  <ellipse className="ring-ellipse" cx={cx} cy={cy} rx={rx} ry={ry} fill="none" stroke="rgba(20,63,52,.3)" strokeWidth="1.6" strokeDasharray="5 6"/>
+                  {placed.map(pl=>pl.links.map(aid=>{const c=cardPos[pl.pid],a=actPos[aid];if(!c||!a)return null;const mx=(c.x+a.x)/2,my=(c.y+a.y)/2;const qx=(mx+cx)/2,qy=(my+cy)/2;const col='var(--'+(STEP_BY_ID[pl.stepId]||{}).d+')';const on=sel===pl.pid;return <path key={pl.pid+aid} d={"M"+c.x+","+c.y+" Q"+qx+","+qy+" "+a.x+","+a.y} fill="none" stroke={col} strokeWidth={on?2.6:1.7} opacity={on?0.85:0.4}/>;}))}
+                </svg>
+                {acts.map((a,i)=>{const pos=actPos[a.id];const linked=selPlaced&&selPlaced.links.indexOf(a.id)!==-1;const col=linked?'var(--'+(STEP_BY_ID[selPlaced.stepId]||{}).d+')':undefined;return (
+                  <div key={a.id} className={"ring-act"+(selPlaced?' linkable':'')+(linked?' linked':'')} style={{left:pos.x,top:pos.y,borderColor:col}} onClick={()=>{if(selPlaced)toggleLink(selPlaced.pid,a.id);}} title={a.label}><span className="ra-num">{i+1}</span><span className="ra-label">{a.label||('Step '+(i+1))}</span></div>
+                );})}
+                {placed.map(pl=>{const pos=cardPos[pl.pid];const st=STEP_BY_ID[pl.stepId]||{};const isSel=sel===pl.pid;const unlinked=!pl.links||pl.links.length===0;return (
+                  <div key={pl.pid} className={"ring-card"+(isSel?' sel':'')+(unlinked?' unlinked':'')} style={{left:pos.x,top:pos.y,borderLeftColor:'var(--'+st.d+')',boxShadow:isSel?'0 0 0 2px var(--'+st.d+')':undefined}} onClick={()=>setSel(isSel?null:pl.pid)} title={unlinked?'Not linked yet — click, then click an activity':st.desc}><span className="rc-name">{st.name}</span><button className="rc-x" onClick={(e)=>{e.stopPropagation();if(sel===pl.pid)setSel(null);removeStep(pl.pid);}} aria-label="Remove" title="Remove">{I.x}</button></div>
+                );})}
+                {placed.length===0 && <div className="ring-empty">Add causal steps from the left to begin →</div>}
+              </div>
+            </div>
+          </div>
+          <div className="ring-key">
+            <div className="section-h"><h2>What you've mapped</h2></div>
+            {placed.length===0 ? <p className="sub-muted" style={{margin:0}}>No causal steps yet. Add a few from the left to show how your programme creates change.</p> : (
+              <>
+                {placed.length>7 && <p className="banner" style={{background:'var(--accent-soft)',borderColor:'var(--accent-line)',color:'var(--accent)'}}>That's {placed.length} causal steps. Most theories of change lean on a few primary ones — consider trimming.</p>}
+                <ul className="key-list">
+                  {placed.map(pl=>{const st=STEP_BY_ID[pl.stepId]||{};const nums=pl.links.map(aid=>{const idx=acts.findIndex(a=>a.id===aid);return idx>=0?idx+1:null;}).filter(x=>x).sort((a,b)=>a-b);return (
+                    <li key={pl.pid}><span className="key-dot" style={{background:'var(--'+st.d+')'}}></span><strong>{st.name}</strong>{nums.length? <span className="key-links">&nbsp;→ activity {nums.join(', ')}</span> : <span className="key-none">&nbsp;not linked yet</span>}</li>
+                  );})}
+                </ul>
+              </>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function NoSteps({msg}){
+  return (<div className="container"><div className="placeholder"><div className="pm"><Glyph c="var(--primary-line)" s={34}/></div><p style={{margin:0}}>{msg}</p></div></div>);
+}
+
+function Modal({title,onClose,children,footer}){
+  useEffect(()=>{const h=(e)=>{if(e.key==='Escape')onClose();};window.addEventListener('keydown',h);return ()=>window.removeEventListener('keydown',h);},[]);
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal" role="dialog" aria-modal="true" onClick={e=>e.stopPropagation()}>
+        <div className="modal-head"><h3>{title}</h3><button className="iconbtn" onClick={onClose} aria-label="Close">{I.x}</button></div>
+        <div className="modal-body">{children}</div>
+        {footer && <div className="modal-foot">{footer}</div>}
+      </div>
+    </div>
+  );
+}
+
+/* ---------- Step 4: Levers & mechanisms ---------- */
+function Levers({p,toggleLever,setLeverAns,dismissed,onDismiss,onHelp}){
+  const placed=placedSorted(p);
+  const [edit,setEdit]=useState(null);
+  if(placed.length===0) return <NoSteps msg="No causal steps yet — go back to the Causal ring step and add a few first."/>;
+  const levs=p.levers||{};
+  const openLever=(stepId,leverId,wasOn)=>{ if(!wasOn) toggleLever(stepId,leverId); setEdit({stepId,leverId}); };
+  const cur=edit?(LEVER_BY_ID[edit.leverId]||{}):null;
+  const curAns=edit?((levs[edit.stepId]||{})[edit.leverId]||''):'';
+  return (
+    <div className="container">
+      <h1 className="title disp">How your programme activates each step</h1>
+      <p className="lede">Tick the levers each step uses — a pop-up asks you how, in your own words.</p>
+      <WhyBox step={3} onHelp={onHelp} dismissed={dismissed} onDismiss={onDismiss}/>
+      <div className="lev-grid">
+        {placed.map(pl=>{
+          const st=STEP_BY_ID[pl.stepId]||{};const sel=levs[pl.stepId]||{};
+          return (
+            <div className="lev-card" key={pl.pid}>
+              <div className="lev-head"><span className="key-dot" style={{background:'var(--'+st.d+')'}}></span><strong>{st.name}</strong></div>
+              <div className="chip-wrap">
+                {leversFor(st.d).map(l=>{const on=(l.id in sel);const ans=on&&(sel[l.id]||'').trim();return (
+                  <button key={l.id} className={"chip"+(on?' on':'')} style={on?{background:'var(--'+st.d+')',borderColor:'var(--'+st.d+')'}:null} onClick={()=>openLever(pl.stepId,l.id,on)} title={l.q}>
+                    {ans?<span className="chip-ck">{I.check}</span>:null}{l.name}
+                  </button>
+                );})}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+      {edit && <Modal title={cur.name} onClose={()=>setEdit(null)} footer={<><button className="btn btn-ghost" onClick={()=>{toggleLever(edit.stepId,edit.leverId);setEdit(null);}}>Remove lever</button><button className="btn btn-primary" onClick={()=>setEdit(null)}>Done</button></>}>
+        <p className="modal-q">{cur.q}</p>
+        <textarea rows="4" autoFocus value={curAns} onChange={e=>setLeverAns(edit.stepId,edit.leverId,e.target.value)} placeholder="In a sentence…"/>
+      </Modal>}
+    </div>
+  );
+}
+
+/* ---------- Step 5: Indicators ---------- */
+function Indicators({p,toggleIndicator,dismissed,onDismiss,onHelp}){
+  const placed=placedSorted(p);
+  const [detail,setDetail]=useState(null);
+  if(placed.length===0) return <NoSteps msg="No causal steps yet — add some on the Causal ring step and indicators will be recommended here."/>;
+  const ind=p.indicators||{};const on=(id)=>ind[id]!==false;
+  const count=placed.filter(pl=>on(pl.stepId)).length;
+  const dStep=detail?(STEP_BY_ID[detail]||{}):null;const dInd=detail?INDICATORS[detail]:null;
+  return (
+    <div className="container">
+      <h1 className="title disp">Recommended indicators</h1>
+      <p className="lede">A starter set, already ticked — untick what you won't use, tap a card for the detail.</p>
+      <WhyBox step={4} onHelp={onHelp} dismissed={dismissed} onDismiss={onDismiss}/>
+      <p className="ind-count">{count} selected{count>12?' — that may be a lot for one page':''}</p>
+      <div className="ind-grid">
+        {placed.map(pl=>{const st=STEP_BY_ID[pl.stepId]||{};const d=INDICATORS[pl.stepId];if(!d)return null;const checked=on(pl.stepId);return (
+          <div className={"ind-cell"+(checked?'':' off')} key={pl.pid}>
+            <input type="checkbox" className="ind-cb" checked={checked} onChange={()=>toggleIndicator(pl.stepId)} aria-label={"Select "+st.name}/>
+            <button className="ind-main" onClick={()=>setDetail(pl.stepId)}>
+              <span className="ind-row1"><span className="key-dot" style={{background:'var(--'+st.d+')'}}></span><strong>{st.name}</strong>{d.minSet&&<span className="ind-star">★</span>}</span>
+              <span className="ind-row2"><span className="lvl">{d.level}</span><span className="ind-tim">{d.timing}</span></span>
+              <span className="ind-prev">{d.know}</span>
+            </button>
+          </div>
+        );})}
+      </div>
+      {detail && dInd && <Modal title={dStep.name} onClose={()=>setDetail(null)} footer={<><span className="modal-meta">{dInd.level} · {dInd.timing}{dInd.minSet?' · ★ minimum set':''}</span><button className={"btn"+(on(detail)?'':' btn-primary')} onClick={()=>toggleIndicator(detail)}>{on(detail)?'Remove from set':'Add to set'}</button></>}>
+        <div className="md-field"><span className="ind-lab">What to know</span><p>{dInd.know}</p></div>
+        <div className="md-field"><span className="ind-lab">Whānau prompt</span><p>{dInd.whanau}</p></div>
+        <div className="md-field"><span className="ind-lab">Practitioner signal</span><p>{dInd.signal}</p></div>
+        <div className="md-field"><span className="ind-lab">Countable measure</span><p>{dInd.countable}</p></div>
+        <div className="md-field"><span className="ind-lab">Admin / IDI data <em className="sens">sensitive · usually needs data agreements</em></span><p>{dInd.admin}</p></div>
+      </Modal>}
+    </div>
+  );
+}
+
+/* ---------- Step 6: Narrative ---------- */
+function Narrative({p,setNarrative,dismissed,onDismiss,onHelp}){
+  const [busy,setBusy]=useState(false);const [msg,setMsg]=useState('');
+  useEffect(()=>{ if(!p.narrative||!p.narrative.trim()) setNarrative(buildNarrative(p)); },[]);
+  const acts=(p.activities||[]).filter(a=>(a.label||'').trim());const placed=placedSorted(p);const levc=selectedLevers(p).length;
+  const ai=async()=>{ setBusy(true);setMsg(''); try{ const t=await aiImprove(p); if(t)setNarrative(t); else setMsg('No text came back — the template draft below is ready to edit.'); }catch(e){ setMsg('AI assist runs in the hosted version, so it is not available in this offline preview. The template draft below works without it.'); } setBusy(false); };
+  return (
+    <div className="container">
+      <h1 className="title disp">Your theory of change, in words</h1>
+      <p className="lede">A plain-language draft, built only from what you have chosen. Edit it freely — the final words are always yours.</p>
+      <WhyBox step={5} onHelp={onHelp} dismissed={dismissed} onDismiss={onDismiss}/>
+      <div className="narr-tools"><button className="btn" onClick={()=>setNarrative(buildNarrative(p))}>Rebuild from my selections</button><button className="btn" onClick={ai} disabled={busy}>{busy?'Working…':'Polish with AI'}</button></div>
+      {msg && <p className="hint" style={{margin:'0 0 12px',maxWidth:720}}>{msg}</p>}
+      <textarea className="narr-area" rows="12" value={p.narrative||''} onChange={e=>setNarrative(e.target.value)} placeholder="Your narrative…"/>
+      <div className="narr-src"><strong>What this draft uses</strong><ul><li>Your setup answers (name, who you work with, the need and the change)</li><li>{acts.length} activit{acts.length===1?'y':'ies'} from your pathway</li><li>{placed.length} causal step{placed.length===1?'':'s'} and {levc} selected lever{levc===1?'':'s'}</li></ul><p className="hint" style={{margin:0}}>It draws only on your inputs and never adds new claims.</p></div>
+    </div>
+  );
+}
+
+/* ---------- Step 7: Coherence ---------- */
+function Coherence({p,goStep,dismissed,onDismiss,onHelp}){
+  const issues=checkCoherence(p);
+  return (
+    <div className="container">
+      <h1 className="title disp">A gentle coherence check</h1>
+      <p className="lede">These are not errors — just a few thoughtful prompts to help your theory of change hold together. Nothing here stops you finishing.</p>
+      <WhyBox step={6} onHelp={onHelp} dismissed={dismissed} onDismiss={onDismiss}/>
+      {issues.length===0 ? (<div className="coh-ok">{I.check}<span>Your theory of change reads as coherent — nothing to flag. You are ready to export.</span></div>) : issues.map((iss,i)=>(
+        <div className="coh-card" key={i}><div className="coh-h">{iss.title}</div><p className="coh-msg">{iss.msg}</p><p className="coh-fix"><strong>Suggestion:</strong> {iss.fix}</p>{iss.step!=null && <button className="btn btn-ghost" onClick={()=>goStep(iss.step)}>Go to {STEPS[iss.step]} {I.right}</button>}</div>
+      ))}
+    </div>
+  );
+}
+
+/* ---------- Static ring (export visual) ---------- */
+function StaticRing({p}){
+  const acts=p.activities||[];const placed=placedSorted(p);
+  const W=560,H=430,cx=W/2,cy=H/2,rx=212,ry=165;
+  const boxH=30,gap=6;const totalH=acts.length*boxH+Math.max(acts.length-1,0)*gap;const startY=cy-totalH/2+boxH/2;
+  const actPos={};acts.forEach((a,i)=>{actPos[a.id]={x:cx,y:startY+i*(boxH+gap)};});
+  const m=placed.length;const cardPos={};placed.forEach((pl,k)=>{const ang=(k/Math.max(m,1))*2*Math.PI;cardPos[pl.pid]={x:cx+rx*Math.sin(ang),y:cy-ry*Math.cos(ang)};});
+  return (
+    <div className="static-ring" style={{width:W,height:H}}>
+      <svg className="sr-svg" viewBox={"0 0 "+W+" "+H} width={W} height={H}>
+        <ellipse cx={cx} cy={cy} rx={rx} ry={ry} fill="none" stroke="rgba(20,63,52,.28)" strokeWidth="1.4" strokeDasharray="4 6"/>
+        {placed.map(pl=>pl.links.map(aid=>{const c=cardPos[pl.pid],a=actPos[aid];if(!c||!a)return null;const qx=((c.x+a.x)/2+cx)/2,qy=((c.y+a.y)/2+cy)/2;return <path key={pl.pid+aid} d={"M"+c.x+","+c.y+" Q"+qx+","+qy+" "+a.x+","+a.y} fill="none" stroke={'var(--'+(STEP_BY_ID[pl.stepId]||{}).d+')'} strokeWidth="1.5" opacity="0.45"/>;}))}
+      </svg>
+      {acts.map((a,i)=>{const pos=actPos[a.id];return <div className="sr-act" key={a.id} style={{left:pos.x,top:pos.y}} title={a.label}><span className="n">{i+1}</span><span className="l">{a.label||('Step '+(i+1))}</span></div>;})}
+      {placed.map(pl=>{const pos=cardPos[pl.pid];const st=STEP_BY_ID[pl.stepId]||{};return <div className="sr-card" key={pl.pid} style={{left:pos.x,top:pos.y,borderLeftColor:'var(--'+st.d+')'}}>{st.name}</div>;})}
+    </div>
+  );
+}
+
+/* ---------- Step 8: Export ---------- */
+function Export({p,dismissed,onDismiss,onHelp}){
+  const placed=placedSorted(p);const acts=p.activities||[];const ind=p.indicators||{};
+  const indSteps=placed.filter(pl=>ind[pl.stepId]!==false&&INDICATORS[pl.stepId]);
+  const narrative=(p.narrative&&p.narrative.trim())?p.narrative:buildNarrative(p);
+  const purpose=strip(p.setup.mainChange)?cap(lc(strip(p.setup.mainChange)))+'.':'';
+  const assumptions=deriveAssumptions(p);
+  return (
+    <div className="container">
+      <WhyBox step={7} onHelp={onHelp} dismissed={dismissed} onDismiss={onDismiss} className="no-print"/>
+      <div className="export-toolbar no-print"><p className="hint" style={{margin:0,maxWidth:540}}>Two one-pagers, built from your selections. Use Print to save them as a PDF (choose “Save as PDF” as the destination).</p><button className="btn btn-primary" onClick={()=>window.print()}>Print / Save as PDF</button></div>
+      <div className="export-page">
+        <div className="ep-head"><div><div className="ep-kicker">Theory of change</div><h2 className="ep-title">{p.setup.name||'Untitled programme'}</h2></div><Tile s={34}/></div>
+        {purpose && <p className="ep-purpose">{purpose}</p>}
+        <StaticRing p={p}/>
+        <div className="ep-narr">{narrative.split('\n\n').filter(Boolean).map((para,i)=><p key={i}>{para}</p>)}</div>
+        <div className="ep-cols">
+          <div><h3>Causal steps &amp; levers</h3><ul className="ep-sl">{placed.length===0?<li>No causal steps selected.</li>:placed.map(pl=>{const st=STEP_BY_ID[pl.stepId]||{};const sel=(p.levers||{})[pl.stepId]||{};const lev=Object.keys(sel).map(id=>(LEVER_BY_ID[id]||{}).name).filter(Boolean);return <li key={pl.pid}><span className="key-dot" style={{background:'var(--'+st.d+')',marginTop:5}}></span><span><strong>{st.name}</strong>{lev.length>0&&<span className="sl-lev">{lev.join(', ')}</span>}</span></li>;})}</ul></div>
+          <div><h3>Key assumptions</h3><ol className="ep-as">{assumptions.map((a,i)=><li key={i}>{a}</li>)}</ol></div>
+        </div>
+      </div>
+      <div className="export-page">
+        <div className="ep-head"><div><div className="ep-kicker">Measurement summary</div><h2 className="ep-title">{p.setup.name||'Untitled programme'}</h2></div><Tile s={34}/></div>
+        {indSteps.length===0 ? <p className="ep-purpose">No indicators selected yet. Choose some on the Indicators step.</p> : (
+          <div className="meas-list">{indSteps.map(pl=>{const st=STEP_BY_ID[pl.stepId]||{};const d=INDICATORS[pl.stepId];return (
+            <div className="meas-block" key={pl.pid}>
+              <div className="mb-head"><span className="key-dot" style={{background:'var(--'+st.d+')'}}></span><strong>{st.name}</strong><span className="lvl">{d.level}</span><span className="mb-tim">{d.timing}</span></div>
+              <div className="mb-grid">
+                <div className="mb-f"><span className="mb-lab">What to know</span><p>{d.know}</p></div>
+                <div className="mb-f"><span className="mb-lab">Whānau prompt</span><p>{d.whanau}</p></div>
+                <div className="mb-f"><span className="mb-lab">Practitioner signal</span><p>{d.signal}</p></div>
+                <div className="mb-f"><span className="mb-lab">Countable measure</span><p>{d.countable}</p></div>
+                <div className="mb-f mb-wide"><span className="mb-lab">Admin / IDI data <em className="sens">sensitive · usually needs data agreements</em></span><p>{d.admin}</p></div>
+              </div>
+            </div>
+          );})}</div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+/* ============ HELP (why + impact + how) ============ */
+const HELP={
+  dashboard:{title:'Your dashboard',why:'This is your home. Everything you build is saved here, and the examples give you a real starting point instead of a blank page.',impact:'Adapting a worked example gets you to a credible theory of change far faster than starting cold.',how:['Open an example to explore a finished theory of change','Or start a new one with the green button','Reopen anything you have saved from the list below']},
+  0:{title:'Setup',why:'A few plain details about your programme, so the tool can speak in your context rather than generic language.',impact:'These answers seed your narrative and tailor the indicator suggestions later — better in, better out.',how:['Write a sentence or two per box, no jargon needed','Everything saves as you type','Come back and refine it anytime']},
+  1:{title:'Pathway',why:'Your real activities, in the order they happen — the concrete things your programme actually does.',impact:'This is the backbone everything hangs on; the causal steps and measures all attach to these activities.',how:['Add steps, or start from a template and adjust','Rename, reorder, or remove any row','Keep each step to one clear action']},
+  2:{title:'Causal ring',why:'Activities are what you do; causal steps are the change underneath. Linking them shows how your work creates change.',impact:'This is the heart of the theory of change — it turns a list of activities into a logic of how change happens.',how:['Add a causal step from the left','Click it on the ring, then click an activity to link them','A new step stays dashed until you link it']},
+  3:{title:'Levers',why:'For each causal step, the levers name the mechanism — the “how” that makes that change actually fire.',impact:'Levers make your logic specific and defensible, and they feed the narrative’s explanation of how change works.',how:['Tick only the levers a step genuinely uses','Answer the short pop-up question in your words','A couple of levers per step is plenty']},
+  4:{title:'Indicators',why:'For each step, a practical way to tell whether the change is really happening — in whānau words, practitioner signals and counts.',impact:'This becomes your one-page measurement summary — how you will show the programme is working.',how:['Keep the ones that fit; untick the rest','Tap a card for the full detail','Aim for 8–12 across the whole set']},
+  5:{title:'Narrative',why:'A plain-language story of your theory of change, assembled only from the choices you have made.',impact:'This is the words people read — the narrative on your one-page theory of change.',how:['Read the draft built from your selections','Edit it freely in your own voice','Rebuild it if you change things, or polish with AI']},
+  6:{title:'Review',why:'A few gentle prompts that check your logic holds together before you export.',impact:'Catching gaps now means the theory of change you share is stronger and more credible.',how:['Read each “something to consider” prompt','Use the link to jump back and adjust','Nothing here blocks you from finishing']},
+  7:{title:'Export',why:'Your two finished one-pagers — the theory of change and the measurement summary.',impact:'These are the shareable outputs for funders, partners and your team to sign off.',how:['Check both pages read well','Use Print and choose “Save as PDF”','Come back and re-export anytime you update']}
+};
+function WhyBox({step,onHelp,dismissed,onDismiss,className}){
+  const h=HELP[step]; if(!h) return null;
+  const id='why-'+step;
+  if(dismissed.indexOf(id)!==-1) return null;
+  return (
+    <div className={"why"+(className?' '+className:'')}>
+      <span className="why-ic">{I.bulb}</span>
+      <div className="why-tx">
+        <span className="why-line"><span className="why-k">Why this step</span>{h.why}</span>
+        <span className="why-line"><span className="why-k">How it shows impact</span>{h.impact}</span>
+      </div>
+      <div className="why-act">
+        <button className="why-link" onClick={()=>onHelp(step)}>How to use {I.right}</button>
+        <button className="why-x" onClick={()=>onDismiss(id)} aria-label="Dismiss" title="Dismiss">{I.x}</button>
+      </div>
+    </div>
+  );
+}
+function HelpPage({focus,onClose,goStep}){
+  const refs=useRef({});
+  useEffect(()=>{ if(focus!=null&&refs.current[focus]&&refs.current[focus].scrollIntoView){ refs.current[focus].scrollIntoView({behavior:'smooth',block:'center'}); } },[focus]);
+  const order=['dashboard',0,1,2,3,4,5,6,7];
+  return (
+    <div className="container help-wrap">
+      <div className="dash-head">
+        <div><h1 className="title disp">How to use Whiria Ngā Ara</h1><p className="hint" style={{marginTop:2}}>What each screen is for, why it matters, and how to use it. Jump straight to any screen.</p></div>
+        <button className="btn btn-ghost" onClick={onClose}>{I.left} Back</button>
+      </div>
+      <div className="help-list">
+        {order.map(k=>{const h=HELP[k];const isStep=(typeof k==='number');return (
+          <div className={"help-card"+(focus===k?' focus':'')} key={String(k)} ref={el=>{refs.current[k]=el;}}>
+            <div className="help-h"><span className="help-num">{isStep?(k+1):'·'}</span><h2>{h.title}</h2>{isStep&&<button className="btn btn-ghost help-go" onClick={()=>goStep(k)}>Go to this screen {I.right}</button>}</div>
+            <p className="help-p"><strong>Why we do this.</strong> {h.why}</p>
+            <p className="help-p"><strong>How it shows impact.</strong> {h.impact}</p>
+            <div className="help-how"><span className="help-how-l">How to use it</span><ol>{h.how.map((s,i)=><li key={i}>{s}</li>)}</ol></div>
+          </div>
+        );})}
+      </div>
+    </div>
+  );
+}
+
+/* ============ APP ============ */
+function App(){
+  const [lang,setLang]=useState('en');
+  const [booted,setBooted]=useState(false);
+  const [user,setUser]=useState(null);
+  const [view,setView]=useState('landing');
+  const [index,setIndex]=useState([]);
+  const [project,setProject]=useState(null);
+  const [step,setStep]=useState(0);
+  const [saved,setSaved]=useState(false);
+  const [dismissed,setDismissed]=useState([]);
+  const [helpFocus,setHelpFocus]=useState(null);
+  const [helpReturn,setHelpReturn]=useState('dashboard');
+
+  useEffect(()=>{(async()=>{
+    const idx=await store.get('project_index'); setIndex(idx||[]);
+    const dt=await store.get('dismissed_tips'); setDismissed(dt||[]);
+    setBooted(true);
+  })();},[]);
+
+  useEffect(()=>{
+    if(!project)return;
+    const t=setTimeout(async()=>{
+      const p={...project,updatedAt:Date.now()};
+      await store.set('project:'+p.id,p);
+      setIndex(prev=>{const name=p.setup.name||'Untitled theory of change';const entry={id:p.id,name,type:p.setup.type,updatedAt:p.updatedAt};const next=prev.find(e=>e.id===p.id)?prev.map(e=>e.id===p.id?entry:e):[entry,...prev];store.set('project_index',next);return next;});
+      setSaved(true);setTimeout(()=>setSaved(false),1400);
+    },600);
+    return ()=>clearTimeout(t);
+  },[project]);
+
+  function dismissTip(id){ setDismissed(d=>{ if(d.indexOf(id)!==-1)return d; const n=[...d,id]; store.set('dismissed_tips',n); return n; }); }
+  function openHelp(focusStep){ setHelpFocus(focusStep!=null?focusStep:null); setHelpReturn(view==='help'?helpReturn:view); setView('help'); }
+  function closeHelp(){ setView(helpReturn||'dashboard'); }
+  function helpGoStep(i){ if(project){ setStep(i); setView('project'); } else { setView('dashboard'); } }
+  function signIn(u){ setUser(u); setView('dashboard'); }
+  function signOut(){ setUser(null); setProject(null); setView('landing'); }
+  function goHome(){ setProject(null); setView('dashboard'); }
+
+  async function newProject(){
+    const id=uid();
+    const p={id,createdAt:Date.now(),updatedAt:Date.now(),setup:{name:'',population:'',need:'',mainChange:'',type:'',context:''},activities:[],ring:{placed:[]},levers:{},indicators:{},narrative:''};
+    await store.set('project:'+id,p);
+    const entry={id,name:'Untitled theory of change',type:'',updatedAt:p.updatedAt};
+    const next=[entry,...index];setIndex(next);await store.set('project_index',next);
+    setProject(p);setStep(0);setView('project');
+  }
+  async function startFromExample(key){
+    const ex=EXAMPLES.find(e=>e.key===key); const tpl=TEMPLATES[key];
+    const id=uid();
+    const acts=tpl.acts.map(l=>({id:uid(),label:l}));
+    const placed=tpl.primary.map((stepId,i)=>({pid:uid(),stepId,links:acts[i]?[acts[i].id]:[]}));
+    const p={id,createdAt:Date.now(),updatedAt:Date.now(),setup:{name:tpl.name+' — example',population:ex.setup.population,need:ex.setup.need,mainChange:ex.setup.mainChange,type:tpl.type,context:''},activities:acts,ring:{placed},levers:{},indicators:{},narrative:''};
+    await store.set('project:'+id,p);
+    const entry={id,name:p.setup.name,type:p.setup.type,updatedAt:p.updatedAt};
+    const next=[entry,...index];setIndex(next);await store.set('project_index',next);
+    setProject(p);setStep(0);setView('project');
+  }
+  async function openProject(id){const p=await store.get('project:'+id);if(p){if(!p.setup)p.setup={name:'',population:'',need:'',mainChange:'',type:'',context:''};if(!p.activities)p.activities=[];if(!p.ring)p.ring={placed:[]};if(!p.levers)p.levers={};if(!p.indicators)p.indicators={};if(p.narrative==null)p.narrative='';setProject(p);setStep(0);setView('project');}}
+  async function deleteProject(id){if(!window.confirm('Delete this theory of change? This cannot be undone.'))return;const next=index.filter(e=>e.id!==id);setIndex(next);await store.set('project_index',next);await store.del('project:'+id);}
+
+  const setField=(k,v)=>setProject(p=>({...p,setup:{...p.setup,[k]:v}}));
+  const addAct=()=>setProject(p=>({...p,activities:[...p.activities,{id:uid(),label:''}]}));
+  const setAct=(id,label)=>setProject(p=>({...p,activities:p.activities.map(a=>a.id===id?{...a,label}:a)}));
+  const delAct=(id)=>setProject(p=>{const ring=p.ring||{placed:[]};const placed=ring.placed.map(x=>({...x,links:x.links.filter(l=>l!==id)}));return {...p,activities:p.activities.filter(a=>a.id!==id),ring:{...ring,placed}};});
+  const moveAct=(id,dir)=>setProject(p=>{const a=[...p.activities];const i=a.findIndex(x=>x.id===id);const j=i+dir;if(j<0||j>=a.length)return p;[a[i],a[j]]=[a[j],a[i]];return{...p,activities:a};});
+  const applyTpl=(key)=>{const tpl=TEMPLATES[key];if((project.activities.length||(project.ring&&project.ring.placed.length))&&!window.confirm('Replace your current pathway and ring with the '+tpl.name+' template?'))return;const acts=tpl.acts.map(l=>({id:uid(),label:l}));const placed=tpl.primary.map((stepId,i)=>({pid:uid(),stepId,links:acts[i]?[acts[i].id]:[]}));setProject(p=>({...p,setup:{...p.setup,type:p.setup.type||tpl.type},activities:acts,ring:{placed}}));};
+
+  const addStep=(stepId)=>setProject(p=>{const ring=p.ring||{placed:[]};if(ring.placed.find(x=>x.stepId===stepId))return p;return {...p,ring:{...ring,placed:[...ring.placed,{pid:uid(),stepId,links:[]}]}};});
+  const removeStep=(pid)=>setProject(p=>({...p,ring:{...p.ring,placed:p.ring.placed.filter(x=>x.pid!==pid)}}));
+  const toggleLink=(pid,aid)=>setProject(p=>({...p,ring:{...p.ring,placed:p.ring.placed.map(x=>{if(x.pid!==pid)return x;const has=x.links.indexOf(aid)!==-1;return {...x,links:has?x.links.filter(l=>l!==aid):[...x.links,aid]};})}}));
+
+  const toggleLever=(stepId,leverId)=>setProject(p=>{const levers={...(p.levers||{})};const s={...(levers[stepId]||{})};if(leverId in s)delete s[leverId];else s[leverId]='';if(Object.keys(s).length)levers[stepId]=s;else delete levers[stepId];return {...p,levers};});
+  const setLeverAns=(stepId,leverId,val)=>setProject(p=>{const levers={...(p.levers||{})};const s={...(levers[stepId]||{})};s[leverId]=val;levers[stepId]=s;return {...p,levers};});
+  const toggleIndicator=(stepId)=>setProject(p=>{const ind={...(p.indicators||{})};ind[stepId]=(ind[stepId]===false)?true:false;return {...p,indicators:ind};});
+  const setNarrative=(t)=>setProject(p=>({...p,narrative:t}));
+
+  function onBack(){if(step===0){goHome();}else setStep(step-1);}
+  function onNext(){if(step<7)setStep(step+1);else goHome();}
+
+  if(!booted) return <div className="container"><p className="hint">Loading…</p></div>;
+  if(view==='landing') return <Landing onSignIn={signIn}/>;
+
+  return (
+    <div className="shell">
+      <TopBar step={view==='project'?step:null} saved={saved} lang={lang} setLang={setLang} user={user} onHome={goHome} onSignOut={signOut} onHelp={()=>openHelp(view==='project'?step:null)}/>
+      <div className="main">
+        {view==='dashboard' && <Dashboard index={index} user={user} onNew={newProject} onExample={startFromExample} onOpen={openProject} onDelete={deleteProject} dismissed={dismissed} onDismiss={dismissTip} onHelp={openHelp}/>}
+        {view==='help' && <HelpPage focus={helpFocus} onClose={closeHelp} goStep={helpGoStep}/>}
+        {view==='project' && <>
+          {step===0 && <Setup p={project} setField={setField} reo={lang==='mi'} dismissed={dismissed} onDismiss={dismissTip} onHelp={openHelp}/>}
+          {step===1 && <Pathway p={project} add={addAct} setAct={setAct} del={delAct} move={moveAct} applyTpl={applyTpl} dismissed={dismissed} onDismiss={dismissTip} onHelp={openHelp}/>}
+          {step===2 && <CausalRing p={project} addStep={addStep} removeStep={removeStep} toggleLink={toggleLink} dismissed={dismissed} onDismiss={dismissTip} onHelp={openHelp}/>}
+          {step===3 && <Levers p={project} toggleLever={toggleLever} setLeverAns={setLeverAns} dismissed={dismissed} onDismiss={dismissTip} onHelp={openHelp}/>}
+          {step===4 && <Indicators p={project} toggleIndicator={toggleIndicator} dismissed={dismissed} onDismiss={dismissTip} onHelp={openHelp}/>}
+          {step===5 && <Narrative p={project} setNarrative={setNarrative} dismissed={dismissed} onDismiss={dismissTip} onHelp={openHelp}/>}
+          {step===6 && <Coherence p={project} goStep={setStep} dismissed={dismissed} onDismiss={dismissTip} onHelp={openHelp}/>}
+          {step===7 && <Export p={project} dismissed={dismissed} onDismiss={dismissTip} onHelp={openHelp}/>}
+        </>}
+      </div>
+      {view==='project' && <Footer step={step} onBack={onBack} onNext={onNext}/>}
+    </div>
+  );
+}
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>
